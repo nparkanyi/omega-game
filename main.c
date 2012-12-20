@@ -12,6 +12,7 @@
 int main ( int argc, char** argv )
 {
     int running = 0;
+    int moveLeft = 0;
     SDL_Surface * screen;
     /* buffer for double buffering */
     SDL_Surface * drawbuff;
@@ -70,7 +71,7 @@ int main ( int argc, char** argv )
                                 dstrect.y -= 10;
                                 break;
                             case SDLK_LEFT:
-                                dstrect.x -= 10;
+                                moveLeft = 1;
                                 break;
                             case SDLK_RIGHT:
                                 dstrect.x += 10;
@@ -80,6 +81,9 @@ int main ( int argc, char** argv )
 
         }
 
+        if (moveLeft == 1){
+            dstrect.x --;
+        }
 
         SDL_FillRect(drawbuff, 0, SDL_MapRGB(screen->format, 0, 0, 0));
 
