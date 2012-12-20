@@ -11,8 +11,13 @@
 
 int main ( int argc, char** argv )
 {
-    int running;
-    int i;
+    int running = 0;
+    SDL_Surface * screen;
+    /* buffer for double buffering */
+    SDL_Surface * drawbuff;
+    SDL_Surface * bmp;
+    SDL_Rect dstrect;
+
     /* start SDL's video functionality */
     if ( SDL_Init( SDL_INIT_VIDEO ) < 0 )
     {
@@ -20,10 +25,7 @@ int main ( int argc, char** argv )
         return 1;
     }
 
-    atexit(SDL_Quit);
-
     /* create a new window */
-    SDL_Surface * screen;
     screen = SDL_SetVideoMode(640, 480, 16, SDLSFTYPE);
     if (screen == NULL)
     {
@@ -31,8 +33,7 @@ int main ( int argc, char** argv )
         return 1;
     }
 
-    // load an image
-    SDL_Surface * bmp;
+    /* load an image */
     bmp = SDL_LoadBMP("cb.bmp");
     if (bmp == NULL)
     {
@@ -40,44 +41,57 @@ int main ( int argc, char** argv )
         return 1;
     }
 
-    // centre the bitmap on screen
-    SDL_Rect dstrect;
-    dstrect.x = (screen->w - bmp->w) / 2;
-    dstrect.y = (screen->h - bmp->h) / 2;
+    drawbuff = SDL_CreateRGBSurface(SDLSFTYPE, 640, 480, 32, 0, 0, 0, 0);
 
-    while (1)
-    {
-        // message processing loop
+    dstrect.x = 20;
+    dstrect.y = 20;
+
+    while (running == 0){
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
             switch (event.type)
             {
                 /* this event indicates the window being closed */
-            case SDL_QUIT:
-                running = 1;
-                break;
+                case SDL_QUIT:
+                    running = 1;
+                    break;
 
                 /* event for a key being pressed down */
-            case SDL_KEYDOWN:
-                {
-                    // exit if ESCAPE is pressed
-                    if (event.key.keysym.sym == SDLK_ESCAPE)
-                        running = 1;
-                    break;
-                }
+                case SDL_KEYDOWN:
+                        switch (event.key.keysym.sym){
+                            case SDLK_ESCAPE:
+                                running = 1;
+                                break;
+                            case SDLK_DOWN:
+                                dstrect.y += 10;
+                                break;
+                            case SDLK_UP:
+                                dstrect.y -= 10;
+                                break;
+                            case SDLK_LEFT:
+                                dstrect.x -= 10;
+                                break;
+                            case SDLK_RIGHT:
+                                dstrect.x += 10;
+                                break;
+                        }
             }
+
         }
 
-        SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
 
-        SDL_BlitSurface(bmp, 0, screen, &dstrect);
+        SDL_FillRect(drawbuff, 0, SDL_MapRGB(screen->format, 0, 0, 0));
+
+        SDL_BlitSurface(bmp, 0, drawbuff, &dstrect);
 
         /* update the screen */
+        SDL_BlitSurface(drawbuff, NULL, screen, NULL);
         SDL_Flip(screen);
     }
 
     SDL_FreeSurface(bmp);
+    SDL_Quit();
 
     return 0;
 }
