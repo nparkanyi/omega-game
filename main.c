@@ -5,7 +5,7 @@
  * to be hardware instead of software (can be problematic on some systems) */
 
 #ifndef SDLSFTYPE
-#define SDLSFTYPE SDL_HWSURFACE|SDL_DOUBLEBUF
+#define SDLSFTYPE SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_FULLSCREEN
 #endif
 #include <stdlib.h>
 #include <SDL/SDL.h>
@@ -19,6 +19,7 @@ int main ( int argc, char** argv )
     /* buffer for double buffering */
     SDL_Surface * drawbuff;
     SDL_Surface * bmp;
+    SDL_Surface * background;
     SDL_Rect dstrect;
 
     /* start SDL's video functionality */
@@ -35,13 +36,24 @@ int main ( int argc, char** argv )
         printf("Unable to set 640x480 video: %s\n", SDL_GetError());
         return 1;
     }
+    SDL_ShowCursor(0);
 
     /* load an image */
-    bmp = SDL_LoadBMP("cb.bmp");
+    bmp = SDL_LoadBMP("img/shipblue1.bmp");
     if (bmp == NULL)
     {
         printf("Unable to load bitmap: %s\n", SDL_GetError());
         return 1;
+    }
+    else{
+        SDL_SetColorKey(bmp, SDL_SRCCOLORKEY, SDL_MapRGB(screen->format, 255, 255, 255));
+    }
+
+    background = SDL_LoadBMP("img/background.bmp");
+    if (background == NULL)
+    {
+        printf("Unable to load bitmap: %s\n", SDL_GetError());
+	return 1;
     }
 
     drawbuff = SDL_CreateRGBSurface(SDLSFTYPE, 640, 480, 32, 0, 0, 0, 0);
@@ -86,24 +98,23 @@ int main ( int argc, char** argv )
 	switch (direction){
 	
 	    case 4:
-                dstrect.x -= 10;
+                dstrect.x -= 2;
 	    	break;
 
 	    case 2:
-	        dstrect.x += 10;
+	        dstrect.x += 2;
 	    	break;
 
 	    case 3:
-	    	dstrect.y += 10;
+	    	dstrect.y += 2;
 		break;
 
 	    case 1:
-	    	dstrect.y -= 10;
+	    	dstrect.y -= 2;
 		break;
 	}
 
-        SDL_FillRect(drawbuff, 0, SDL_MapRGB(screen->format, 0, 0, 0));
-
+	SDL_BlitSurface(background, NULL, drawbuff, NULL);
         SDL_BlitSurface(bmp, 0, drawbuff, &dstrect);
 
         /* update the screen */
