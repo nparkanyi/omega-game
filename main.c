@@ -3,6 +3,7 @@
 
 /* the surface type, software or hardware. Could be defined during compilation
  * to be hardware instead of software (can be problematic on some systems) */
+
 #ifndef SDLSFTYPE
 #define SDLSFTYPE SDL_HWSURFACE|SDL_DOUBLEBUF
 #endif
@@ -12,7 +13,8 @@
 int main ( int argc, char** argv )
 {
     int running = 0;
-    int moveLeft = 0;
+    int direction = 0;
+
     SDL_Surface * screen;
     /* buffer for double buffering */
     SDL_Surface * drawbuff;
@@ -65,25 +67,40 @@ int main ( int argc, char** argv )
                                 running = 1;
                                 break;
                             case SDLK_DOWN:
-                                dstrect.y += 10;
+				direction = 3;
                                 break;
                             case SDLK_UP:
-                                dstrect.y -= 10;
+				direction = 1;
                                 break;
                             case SDLK_LEFT:
-                                moveLeft = 1;
+				direction = 4;
                                 break;
                             case SDLK_RIGHT:
-                                dstrect.x += 10;
+				direction = 2;
                                 break;
                         }
             }
 
         }
 
-        if (moveLeft == 1){
-            dstrect.x --;
-        }
+	switch (direction){
+	
+	    case 4:
+                dstrect.x -= 10;
+	    	break;
+
+	    case 2:
+	        dstrect.x += 10;
+	    	break;
+
+	    case 3:
+	    	dstrect.y += 10;
+		break;
+
+	    case 1:
+	    	dstrect.y -= 10;
+		break;
+	}
 
         SDL_FillRect(drawbuff, 0, SDL_MapRGB(screen->format, 0, 0, 0));
 
