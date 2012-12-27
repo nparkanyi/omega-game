@@ -19,7 +19,7 @@ typedef struct {
      * not the player is moving at all. Elements 1-4 represent the
      * cardinal directions.*/
     int direction[5];    
-    /* 4 directions for each of the ships four colours */
+    /* 4 directions for each of the ship's four colours */
     SDL_Surface * sprites[4][4];
     /* used for SDL blitting, contains the coordinates to blit to */
     SDL_Rect destrect;
@@ -28,10 +28,15 @@ typedef struct {
     bullet bullets[4][10];
 } player;
 
+void load_sprite(SDL_Surface ** sprites, int num_sprites, 
+        const char * prefix, const char * postfix);
 /* load_bullet and load_player initialize the structures and 
  * load the necessary bitmaps */
 void load_bullet(bullet * bul);
 player load_player();
+
 void move_player(player * ship);
+void move_bullets(player * ship);
+
 void draw_player(player * ship, SDL_Surface * destbuff);
 void draw_bullet(bullet * bul);

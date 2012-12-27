@@ -2,13 +2,18 @@
  * "Omega" shooter game. */
 
 /* the surface type, software or hardware. Could be defined during compilation
- * to be hardware instead of software (can be problematic on some systems) */
+ * to be hardware instead of software (can be problematic on some systems, so it's
+ * not the default) */
 
 #ifndef SDLSFTYPE
-#define SDLSFTYPE SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_FULLSCREEN
+#define SDLSFTYPE SDL_SWSURFACE|SDL_FULLSCREEN
 #endif
 #include <stdlib.h>
 #include <SDL/SDL.h>
+#include "player.h"
+
+/*returns the number of milliseconds passed since it was last called   */
+int get_time();
 
 int main ( int argc, char** argv )
 {
@@ -45,7 +50,8 @@ int main ( int argc, char** argv )
         printf("Unable to load bitmap: %s\n", SDL_GetError());
         return 1;
     }
-    else{
+    else {
+	/* sets the transparent colour of the bitmap */
         SDL_SetColorKey(bmp, SDL_SRCCOLORKEY, SDL_MapRGB(screen->format, 255, 255, 255));
     }
 
@@ -61,8 +67,12 @@ int main ( int argc, char** argv )
     dstrect.x = 20;
     dstrect.y = 20;
 
+    /* set an initial time to compare against*/
+    get_time();
+
     while (running == 0){
         SDL_Event event;
+
         while (SDL_PollEvent(&event))
         {
             switch (event.type)
@@ -91,6 +101,14 @@ int main ( int argc, char** argv )
 				direction = 2;
                                 break;
                         }
+			break;
+		case SDL_KEYUP:
+		    if (event.key.keysym.sym == SDLK_DOWN ||
+		            event.key.keysym.sym == SDLK_UP ||
+			    event.key.keysym.sym == SDLK_RIGHT ||
+			    event.key.keysym.sym == SDLK_LEFT){
+		        direction = 0;
+		    }
             }
 
         }
@@ -123,7 +141,22 @@ int main ( int argc, char** argv )
     }
 
     SDL_FreeSurface(bmp);
+    SDL_FreeSurface(drawbuff);
+    SDL_FreeSurface(background);
+    SDL_FreeSurface(screen);
     SDL_Quit();
 
     return 0;
+}
+
+int get_time()
+{
+    static Uint32 time_last;
+    int time_current;
+    int temp;
+    
+    temp = SDL_GetTicks();
+    time_current = temp - time_last;
+    time_last = temp;
+    return time_current;
 }
