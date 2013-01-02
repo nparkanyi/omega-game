@@ -19,16 +19,16 @@ player load_player()
     load_sprite(&ship.sprites[3][0], 4, "shipblack", ".bmp");
 
     for (i = 0; i < 10; i++){
-        load_sprite(&ship.bullets[0][i], 4, "bulletyellow", ".bmp");
+        load_sprite(&ship.bullets[0][i].animation[0], 4, "bulletyellow", ".bmp");
     }
     for (i = 0; i < 10; i++){
-        load_sprite(&ship.bullets[1][i], 4, "bulletred", ".bmp");
+        load_sprite(&ship.bullets[1][i].animation[0], 4, "bulletred", ".bmp");
     }
     for (i = 0; i < 10; i++){
-        load_sprite(&ship.bullets[2][i], 4, "bulletblue", ".bmp");
+        load_sprite(&ship.bullets[2][i].animation[0], 4, "bulletblue", ".bmp");
     }
     for (i = 0; i < 10; i++){
-        load_sprite(&ship.bullets[3][i], 4, "bulletblack", ".bmp");
+        load_sprite(&ship.bullets[3][i].animation[0], 4, "bulletblack", ".bmp");
     }
         
     ship.destrect.x = 0;
@@ -40,8 +40,9 @@ player load_player()
 /* general function for loading series of numbered bitmaps into
  * sprites. */
 void load_sprite(SDL_Surface ** sprites, int num_sprites,
-        const char * prefix, conts char * postfix)
+        const char * prefix, const char * postfix)
 {
+    int i;
     char filename[60];
 
     strcpy(filename, prefix); 
