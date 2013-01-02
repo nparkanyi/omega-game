@@ -4,7 +4,7 @@
 enum colours {YELLOW, RED, BLUE, BLACK};
 
 typedef struct {
-    SDL_Surface * animation[6];
+    SDL_Surface * animation[4];
     SDL_Rect destrect;
     /* these indicate the direction in which the bullet moves */
     int direction_x;
@@ -28,15 +28,24 @@ typedef struct {
     bullet bullets[4][10];
 } player;
 
+/* The same data structure for the player will be used for the
+ * enemies. */
+typedef player enemy;
+
+/* general function for loading series of numbered bitmaps into
+ * sprites. */
 void load_sprite(SDL_Surface ** sprites, int num_sprites, 
         const char * prefix, const char * postfix);
+
 /* load_bullet and load_player initialize the structures and 
  * load the necessary bitmaps */
-void load_bullet(bullet * bul);
 player load_player();
+enemy load_enemy();
 
 void move_player(player * ship);
+void move_enemy(enemy * enemy);
 void move_bullets(player * ship);
 
 void draw_player(player * ship, SDL_Surface * destbuff);
+void draw_enemy(enemy * enemy, SDL_Surface * destbuff);
 void draw_bullet(bullet * bul);
