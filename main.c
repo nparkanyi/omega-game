@@ -110,38 +110,38 @@ int main ( int argc, char** argv )
 
         }
 
-        current_time = SDL_GetTicks();
-        if (SDL_GetTicks() - last_time > 30){
+        current_time = SDL_GetTicks() - last_time;
+        if (current_time > 25){
 	    /* accommodates framerate; if framerate slower, ship moves further each frame. */
-	    increment = current_time / 30 * 50; 
+	    increment = current_time / 30.0f * 10; 
+	    printf("%d\n", increment);
     	    switch (direction){
 	        case 4:
                     dstrect.x -= increment;
-	    	    break;
+	            break;
 
 	        case 2:
 	            dstrect.x += increment;
-	    	    break;
+	         break;
 
 	        case 3:
-	    	    dstrect.y += increment;
-		    break;
+	            dstrect.y += increment;
+	            break;
 
 	        case 1:
-	    	    dstrect.y -= increment;
+		    dstrect.y -= increment;
 		    break;
-            }
-
+                }
+        
 	    SDL_BlitSurface(background, NULL, drawbuff, NULL);
             SDL_BlitSurface(bmp, NULL, drawbuff, &dstrect);
 
             /* update the screen */
             SDL_BlitSurface(drawbuff, NULL, screen, NULL);
             SDL_Flip(screen);
-	    last_time = SDL_GetTicks();
+            last_time = SDL_GetTicks();
 	}
     }
-
     SDL_FreeSurface(bmp);
     SDL_FreeSurface(drawbuff);
     SDL_FreeSurface(background);
