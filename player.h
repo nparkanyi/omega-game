@@ -18,7 +18,10 @@ typedef struct {
      * determines whether or
      * not the player is moving at all. Elements 1-4 represent the
      * cardinal directions.*/
-    int direction[5];    
+    int direction[5];  
+    /* 0 to 3 */
+    int orientation;
+    int colour;  
     /* 4 directions for each of the ship's four colours */
     SDL_Surface * sprites[4][4];
     /* used for SDL blitting, contains the coordinates to blit to */

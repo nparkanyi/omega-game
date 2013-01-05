@@ -12,13 +12,13 @@
 #include <SDL/SDL.h>
 #include "player.h"
 
-/*returns the number of milliseconds passed since it was last called   */
-int get_time();
-
 int main ( int argc, char** argv )
 {
     int running = 0;
     int direction = 0;
+    int last_time = 0;
+    int current_time 0;
+    int increment = 10;
 
     SDL_Surface * screen;
     /* buffer for double buffering */
@@ -28,7 +28,7 @@ int main ( int argc, char** argv )
     SDL_Rect dstrect;
 
     /* start SDL's video functionality */
-    if ( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+    if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 )
     {
         printf( "Unable to init SDL: %s\n", SDL_GetError() );
         return 1;
@@ -113,31 +113,36 @@ int main ( int argc, char** argv )
 
         }
 
-	switch (direction){
-	
-	    case 4:
-                dstrect.x -= 2;
-	    	break;
+        current_time = SDL_GetTicks();
+        if (SDL_GetTicks() - last_time > 30){
+	    /* accommodates framerate; if framerate slower, ship moves further each frame. */
+	    increment = current_time / 30 * 20;
+    	    switch (direction){
+	        case 4:
+                    dstrect.x -= increment;
+	    	    break;
 
-	    case 2:
-	        dstrect.x += 2;
-	    	break;
+	        case 2:
+	            dstrect.x += increment;
+	    	    break;
 
-	    case 3:
-	    	dstrect.y += 2;
-		break;
+	        case 3:
+	    	    dstrect.y += increment;
+		    break;
 
-	    case 1:
-	    	dstrect.y -= 2;
-		break;
+	        case 1:
+	    	    dstrect.y -= increment;
+		    break;
+            }
+
+	    SDL_BlitSurface(background, NULL, drawbuff, NULL);
+            SDL_BlitSurface(bmp, NULL, drawbuff, &dstrect);
+
+            /* update the screen */
+            SDL_BlitSurface(drawbuff, NULL, screen, NULL);
+            SDL_Flip(screen);
+	    last_time = SDL_GetTicks();
 	}
-
-	SDL_BlitSurface(background, NULL, drawbuff, NULL);
-        SDL_BlitSurface(bmp, 0, drawbuff, &dstrect);
-
-        /* update the screen */
-        SDL_BlitSurface(drawbuff, NULL, screen, NULL);
-        SDL_Flip(screen);
     }
 
     SDL_FreeSurface(bmp);
@@ -147,16 +152,4 @@ int main ( int argc, char** argv )
     SDL_Quit();
 
     return 0;
-}
-
-int get_time()
-{
-    static Uint32 time_last;
-    int time_current;
-    int temp;
-    
-    temp = SDL_GetTicks();
-    time_current = temp - time_last;
-    time_last = temp;
-    return time_current;
 }

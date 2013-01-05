@@ -37,6 +37,11 @@ player load_player()
     return ship;
 }    
 
+void draw_player(player * ship, SDL_Surface * destbuff)
+{
+    SDL_BlitSurface(ship->sprites[ship->colour][ship->orientation], NULL, destbuff, &ship->destrect);
+}
+
 /* general function for loading series of numbered bitmaps into
  * sprites. */
 void load_sprite(SDL_Surface ** sprites, int num_sprites,
@@ -55,3 +60,4 @@ void load_sprite(SDL_Surface ** sprites, int num_sprites,
         *(sprites + i)  = SDL_LoadBMP(filename);
     }
 }
+
