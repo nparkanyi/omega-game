@@ -43,6 +43,10 @@ int main ( int argc, char** argv )
     }
     SDL_ShowCursor(0);
 
+    /* contains all the player attributes. */
+    player player;
+    player = load_player(screen);
+
     /* load an image */
     bmp = SDL_LoadBMP("img/shipblue1.bmp");
     if (bmp == NULL)
@@ -134,7 +138,7 @@ int main ( int argc, char** argv )
                 }
         
 	    SDL_BlitSurface(background, NULL, drawbuff, NULL);
-            SDL_BlitSurface(bmp, NULL, drawbuff, &dstrect);
+            SDL_BlitSurface(player.sprites[0][0], NULL, drawbuff, &dstrect);
 
             /* update the screen */
             SDL_BlitSurface(drawbuff, NULL, screen, NULL);

@@ -38,7 +38,7 @@ typedef player enemy;
 /* general function for loading series of numbered bitmaps into
  * sprites. */
 void load_sprite(SDL_Surface ** sprites, int num_sprites, 
-        const char * prefix, const char * postfix);
+        const char * prefix, const char * postfix, SDL_Surface * format_surface);
 
 /* load_bullet and load_player initialize the structures and 
  * load the necessary bitmaps */
