@@ -17,7 +17,7 @@ int main ( int argc, char** argv )
     int running = 0;
     int direction = 0;
     int last_time = 0;
-    int current_time 0;
+    int current_time = 0;
     int increment = 10;
 
     SDL_Surface * screen;
@@ -67,9 +67,6 @@ int main ( int argc, char** argv )
     dstrect.x = 20;
     dstrect.y = 20;
 
-    /* set an initial time to compare against*/
-    get_time();
-
     while (running == 0){
         SDL_Event event;
 
@@ -116,7 +113,7 @@ int main ( int argc, char** argv )
         current_time = SDL_GetTicks();
         if (SDL_GetTicks() - last_time > 30){
 	    /* accommodates framerate; if framerate slower, ship moves further each frame. */
-	    increment = current_time / 30 * 20;
+	    increment = current_time / 30 * 50; 
     	    switch (direction){
 	        case 4:
                     dstrect.x -= increment;
