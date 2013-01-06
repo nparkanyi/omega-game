@@ -14,6 +14,9 @@ player load_player(SDL_Surface * format_surface)
         ship.direction[i] = 0;
     }
 
+    ship.colour = BLUE;
+    ship.orientation = 2;
+
     load_sprite(&ship.sprites[0][0], 4, "img/shipyellow", ".bmp", format_surface);
     load_sprite(&ship.sprites[1][0], 4, "img/shipred", ".bmp", format_surface);
     load_sprite(&ship.sprites[2][0], 4, "img/shipblue", ".bmp", format_surface);
@@ -59,7 +62,6 @@ void load_sprite(SDL_Surface ** sprites, int num_sprites,
     for (i = 0; i < num_sprites; i++){
         filename[strlen(prefix)] = '1' + i;	
         *(sprites + i)  = SDL_LoadBMP(filename);
-	printf("%s\n", filename);
 	if (*(sprites + i) == NULL){
 	    printf("Failed to load sprite.\n");
 	}

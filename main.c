@@ -19,6 +19,7 @@ int main ( int argc, char** argv )
     int last_time = 0;
     int current_time = 0;
     int increment = 10;
+    int sprite_num = 0;
 
     SDL_Surface * screen;
     /* buffer for double buffering */
@@ -63,7 +64,7 @@ int main ( int argc, char** argv )
     if (background == NULL)
     {
         printf("Unable to load bitmap: %s\n", SDL_GetError());
-	return 1;
+	    return 1;
     }
 
     drawbuff = SDL_CreateRGBSurface(SDLSFTYPE, 640, 480, 32, 0, 0, 0, 0);
@@ -85,66 +86,98 @@ int main ( int argc, char** argv )
 
                 /* event for a key being pressed down */
                 case SDL_KEYDOWN:
-                        switch (event.key.keysym.sym){
-                            case SDLK_ESCAPE:
-                                running = 1;
-                                break;
-                            case SDLK_DOWN:
-				direction = 3;
-                                break;
-                            case SDLK_UP:
-				direction = 1;
-                                break;
-                            case SDLK_LEFT:
-				direction = 4;
-                                break;
-                            case SDLK_RIGHT:
-				direction = 2;
-                                break;
-                        }
-			break;
-		case SDL_KEYUP:
-		    if (event.key.keysym.sym == SDLK_DOWN ||
-		            event.key.keysym.sym == SDLK_UP ||
-			    event.key.keysym.sym == SDLK_RIGHT ||
-			    event.key.keysym.sym == SDLK_LEFT){
-		        direction = 0;
-		    }
+                    switch (event.key.keysym.sym){
+                        case SDLK_ESCAPE:
+                            running = 1;
+                            break;
+                        case SDLK_DOWN:
+				            direction = 3;
+				            sprite_num = 2;
+                            break;
+                        case SDLK_UP:
+				            direction = 1;
+				            sprite_num = 0;
+                            break;
+                        case SDLK_LEFT:
+				            direction = 4;
+				            sprite_num = 3;
+                            break;
+                        case SDLK_RIGHT:
+				            direction = 2;
+				            sprite_num = 1;
+                            break;
+                        case SDLK_LALT:
+                            if (player.orientation == 3){
+                                player.orientation = 0;
+                            }
+                            else{
+                                player.orientation++;
+                            }
+                            printf("Left Alt \n");
+                            break;
+                        case SDLK_LCTRL:
+                            if (player.orientation == 0){
+                                player.orientation = 3;
+                            }
+                            else{
+                                player.orientation--;
+                            }
+                            printf("Orientation: %d \n", player.orientation);
+                            break;
+                        case SDLK_LSHIFT:
+                            if (player.colour == BLACK){
+                                player.colour = YELLOW;
+                            }
+                            else{
+                                player.colour++;
+                            }
+                            printf("Colour: %d \n", player.colour);
+                            break;
+                    }
+			        break;
+		        case SDL_KEYUP:
+		            if (event.key.keysym.sym == SDLK_DOWN ||
+		                    event.key.keysym.sym == SDLK_UP ||
+			                event.key.keysym.sym == SDLK_RIGHT ||
+			                event.key.keysym.sym == SDLK_LEFT){
+
+		                direction = 0;
+		            }
             }
 
         }
 
         current_time = SDL_GetTicks() - last_time;
         if (current_time > 25){
-	    /* accommodates framerate; if framerate slower, ship moves further each frame. */
-	    increment = current_time / 30.0f * 10; 
-	    printf("%d\n", increment);
+	        /* accommodates framerate; if framerate slower, ship moves further each frame. */
+	        increment = current_time / 30.0f * 10; 
+    	    printf("%d\n", increment);
     	    switch (direction){
-	        case 4:
+	            case 4:
                     dstrect.x -= increment;
-	            break;
+	                break;
 
-	        case 2:
-	            dstrect.x += increment;
-	         break;
+	            case 2:
+	                dstrect.x += increment;
+	                break;
 
-	        case 3:
-	            dstrect.y += increment;
-	            break;
+	            case 3:
+	                dstrect.y += increment;
+	                break;
 
-	        case 1:
-		    dstrect.y -= increment;
-		    break;
-                }
+	            case 1:
+		            dstrect.y -= increment;
+		            break;
+            }
         
-	    SDL_BlitSurface(background, NULL, drawbuff, NULL);
-            SDL_BlitSurface(player.sprites[0][0], NULL, drawbuff, &dstrect);
+	        SDL_BlitSurface(background, NULL, drawbuff, NULL);
+            SDL_BlitSurface(player.sprites[player.colour][player.orientation], NULL, drawbuff, &dstrect);
 
             /* update the screen */
             SDL_BlitSurface(drawbuff, NULL, screen, NULL);
             SDL_Flip(screen);
             last_time = SDL_GetTicks();
-	}
+	    }
     }
     SDL_FreeSurface(bmp);
     SDL_FreeSurface(drawbuff);
