@@ -144,29 +144,22 @@ int main ( int argc, char** argv )
         current_time = SDL_GetTicks() - last_time;
         if (current_time > 25){
 	        /* accommodates framerate; if framerate slower, ship moves further each frame. */
-	        //increment = current_time / 300; 
+	        increment = current_time / 30.0f * 20; 
             
             if (player.direction[3] == 1){
-                player.destrect.x = 120;
-                //player.destrect.x -= increment;
-                printf("%d", increment);
-	            break;
+                player.destrect.x -= increment;
             }
             if (player.direction[1] == 1){
-	            dstrect.x += increment;
-	            break;
+	            player.destrect.x += increment;
             }
             if (player.direction[2] == 1){
 	            player.destrect.y += increment;
-	            break;
             }
             if (player.direction[0] == 1){
 		        player.destrect.y -= increment;
-		        break;
             } 
         
 	        SDL_BlitSurface(background, NULL, drawbuff, NULL);
-            SDL_BlitSurface(player.sprites[player.colour][player.orientation], NULL, drawbuff, &dstrect);
             draw_player(&player, drawbuff);
 
             /* update the screen */
