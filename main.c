@@ -4,7 +4,6 @@
 /* the surface type, software or hardware. Could be defined during compilation
  * to be hardware instead of software (can be problematic on some systems, so it's
  * not the default) */
-
 #ifndef SDLSFTYPE
 #define SDLSFTYPE SDL_SWSURFACE|SDL_FULLSCREEN
 #endif
@@ -28,6 +27,7 @@ int main ( int argc, char** argv )
     SDL_Surface * background;
     SDL_Rect dstrect;
 
+    printf("%d\n", increment);
     /* start SDL's video functionality */
     if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 )
     {
@@ -81,21 +81,18 @@ int main ( int argc, char** argv )
                             running = 1;
                             break;
                         case SDLK_DOWN:
-				            direction = 3;
-				            sprite_num = 2;
+                            player.direction[2] = 1;
                             break;
                         case SDLK_UP:
-				            direction = 1;
-				            sprite_num = 0;
+                            player.direction[0] = 1;
                             break;
                         case SDLK_LEFT:
-				            direction = 4;
-				            sprite_num = 3;
+                            player.direction[3] = 1;
                             break;
                         case SDLK_RIGHT:
-				            direction = 2;
-				            sprite_num = 1;
+                            player.direction[1] = 1;
                             break;
+                        /* rotate the player to the right. */
                         case SDLK_LALT:
                             if (player.orientation == 3){
                                 player.orientation = 0;
@@ -104,6 +101,7 @@ int main ( int argc, char** argv )
                                 player.orientation++;
                             }
                             break;
+                        /* rotate the player to the left. */
                         case SDLK_LCTRL:
                             if (player.orientation == 0){
                                 player.orientation = 3;
@@ -112,6 +110,7 @@ int main ( int argc, char** argv )
                                 player.orientation--;
                             }
                             break;
+                        /* Switch the current colour of the player. */
                         case SDLK_LSHIFT:
                             if (player.colour == BLACK){
                                 player.colour = YELLOW;
@@ -123,13 +122,21 @@ int main ( int argc, char** argv )
                     }
 			        break;
 		        case SDL_KEYUP:
-		            if (event.key.keysym.sym == SDLK_DOWN ||
-		                    event.key.keysym.sym == SDLK_UP ||
-			                event.key.keysym.sym == SDLK_RIGHT ||
-			                event.key.keysym.sym == SDLK_LEFT){
-
-		                direction = 0;
-		            }
+                    switch (event.key.keysym.sym){
+                        case SDLK_DOWN:
+                            player.direction[2] = 0;
+                            break;
+                        case SDLK_UP:
+                            player.direction[0] = 0;
+                            break;
+                        case SDLK_LEFT:
+                            player.direction[3] = 0;
+                            break;
+                        case SDLK_RIGHT:
+                            player.direction[1] = 0;
+                            break;
+                    }
+                    break;
             }
 
         }
@@ -137,33 +144,36 @@ int main ( int argc, char** argv )
         current_time = SDL_GetTicks() - last_time;
         if (current_time > 25){
 	        /* accommodates framerate; if framerate slower, ship moves further each frame. */
-	        increment = current_time / 30.0f * 10; 
-    	    switch (direction){
-	            case 4:
-                    dstrect.x -= increment;
-	                break;
-
-	            case 2:
-	                dstrect.x += increment;
-	                break;
-
-	            case 3:
-	                dstrect.y += increment;
-	                break;
-
-	            case 1:
-		            dstrect.y -= increment;
-		            break;
+	        //increment = current_time / 300; 
+            
+            if (player.direction[3] == 1){
+                player.destrect.x = 120;
+                //player.destrect.x -= increment;
+                printf("%d", increment);
+	            break;
             }
+            if (player.direction[1] == 1){
+	            dstrect.x += increment;
+	            break;
+            }
+            if (player.direction[2] == 1){
+	            player.destrect.y += increment;
+	            break;
+            }
+            if (player.direction[0] == 1){
+		        player.destrect.y -= increment;
+		        break;
+            } 
         
 	        SDL_BlitSurface(background, NULL, drawbuff, NULL);
             SDL_BlitSurface(player.sprites[player.colour][player.orientation], NULL, drawbuff, &dstrect);
+            draw_player(&player, drawbuff);
 
             /* update the screen */
             SDL_BlitSurface(drawbuff, NULL, screen, NULL);
             SDL_Flip(screen);
             last_time = SDL_GetTicks();
-	    }
+	    } 
     }
     delete_player(&player);
     SDL_FreeSurface(drawbuff);
@@ -171,5 +181,5 @@ int main ( int argc, char** argv )
     SDL_FreeSurface(screen);
     SDL_Quit();
 
-    return 0;
+    return (0);
 }

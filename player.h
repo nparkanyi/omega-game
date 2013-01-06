@@ -14,11 +14,10 @@ typedef struct {
 
 typedef struct {
     /* either 1 or 0 to indicate whether the player is currently
-     * moving in that direction. Element [0] 
-     * determines whether or
-     * not the player is moving at all. Elements 1-4 represent the
+     * moving in that direction. 
+     * Elements 0-3 represent the
      * cardinal directions.*/
-    int direction[5];  
+    int direction[4];  
     /* 0 to 3 */
     int orientation;
     int colour;  
@@ -52,3 +51,7 @@ void move_bullets(player * ship);
 void draw_player(player * ship, SDL_Surface * destbuff);
 void draw_enemy(enemy * enemy, SDL_Surface * destbuff);
 void draw_bullet(bullet * bul);
+
+void delete_player(player * ship);
+void delete_enemy(enemy * enemy);
+void delete_bullet(bullet * bul);

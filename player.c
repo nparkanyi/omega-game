@@ -35,8 +35,10 @@ player load_player(SDL_Surface * format_surface)
         load_sprite(&ship.bullets[3][i].animation[0], 4, "img/bulletblack", ".bmp", format_surface);
     }
         
-    ship.destrect.x = 0;
-    ship.destrect.y = 0;
+    ship.destrect.x = 20;
+    ship.destrect.y = 20;
+    ship.destrect.w = 50;
+    ship.destrect.h = 50;
 
     return ship;
 }    
