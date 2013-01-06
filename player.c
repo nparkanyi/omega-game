@@ -14,7 +14,7 @@ player load_player(SDL_Surface * format_surface)
         ship.direction[i] = 0;
     }
 
-    ship.colour = BLUE;
+    ship.colour = YELLOW;
     ship.orientation = 2;
 
     load_sprite(&ship.sprites[0][0], 4, "img/shipyellow", ".bmp", format_surface);
@@ -46,6 +46,29 @@ void draw_player(player * ship, SDL_Surface * destbuff)
     SDL_BlitSurface(ship->sprites[ship->colour][ship->orientation], NULL, destbuff, &ship->destrect);
 }
 
+void delete_bullet(bullet * bul)
+{
+    int i;
+    for (i = 0; i < 4; i++){
+        SDL_FreeSurface(bul->animation[i]);
+    } 
+}
+
+void delete_player(player * ship)
+{
+    int i, j;
+    for (i = 0; i < 4; i++){
+        for (j = 0; j < 4; j++){
+            SDL_FreeSurface(ship->sprites[i][j]);
+        }
+    }
+
+    for(i = 0; i < 4; i++){
+        for (j = 0; j < 10; j++){
+            delete_bullet(&(ship->bullets[i][j]));
+        }
+    }
+}
 /* general function for loading series of numbered bitmaps into
  * sprites. */
 void load_sprite(SDL_Surface ** sprites, int num_sprites,

@@ -48,17 +48,7 @@ int main ( int argc, char** argv )
     player player;
     player = load_player(screen);
 
-    /* load an image */
-    bmp = SDL_LoadBMP("img/shipblue1.bmp");
-    if (bmp == NULL)
-    {
-        printf("Unable to load bitmap: %s\n", SDL_GetError());
-        return 1;
-    }
-    else {
-	/* sets the transparent colour of the bitmap */
-        SDL_SetColorKey(bmp, SDL_SRCCOLORKEY, SDL_MapRGB(screen->format, 255, 255, 255));
-    }
+    
 
     background = SDL_LoadBMP("img/background.bmp");
     if (background == NULL)
@@ -113,7 +103,6 @@ int main ( int argc, char** argv )
                             else{
                                 player.orientation++;
                             }
-                            printf("Left Alt \n");
                             break;
                         case SDLK_LCTRL:
                             if (player.orientation == 0){
@@ -122,7 +111,6 @@ int main ( int argc, char** argv )
                             else{
                                 player.orientation--;
                             }
-                            printf("Orientation: %d \n", player.orientation);
                             break;
                         case SDLK_LSHIFT:
                             if (player.colour == BLACK){
@@ -131,7 +119,6 @@ int main ( int argc, char** argv )
                             else{
                                 player.colour++;
                             }
-                            printf("Colour: %d \n", player.colour);
                             break;
                     }
 			        break;
@@ -151,7 +138,6 @@ int main ( int argc, char** argv )
         if (current_time > 25){
 	        /* accommodates framerate; if framerate slower, ship moves further each frame. */
 	        increment = current_time / 30.0f * 10; 
-    	    printf("%d\n", increment);
     	    switch (direction){
 	            case 4:
                     dstrect.x -= increment;
@@ -179,7 +165,7 @@ int main ( int argc, char** argv )
             last_time = SDL_GetTicks();
 	    }
     }
-    SDL_FreeSurface(bmp);
+    delete_player(&player);
     SDL_FreeSurface(drawbuff);
     SDL_FreeSurface(background);
     SDL_FreeSurface(screen);
