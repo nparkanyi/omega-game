@@ -43,6 +43,28 @@ player load_player(SDL_Surface * format_surface)
     return ship;
 }    
 
+void move_player(player * ship, int time)
+{
+    int increment;
+
+    if (time > 25){
+        /* accommodates framerate; if framerate is slower, ship moves further each frame. */
+	    increment = time / 30.0f * 8; 
+            
+        if (ship->direction[3] == 1){
+            ship->destrect.x -= increment;
+        }
+        if (ship->direction[1] == 1){
+	        ship->destrect.x += increment;
+        }
+        if (ship->direction[2] == 1){
+	        ship->destrect.y += increment;
+        }
+        if (ship->direction[0] == 1){
+		    ship->destrect.y -= increment;
+        } 
+    }
+}
 void draw_player(player * ship, SDL_Surface * destbuff)
 {
     SDL_BlitSurface(ship->sprites[ship->colour][ship->orientation], NULL, destbuff, &ship->destrect);

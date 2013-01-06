@@ -44,7 +44,7 @@ void load_sprite(SDL_Surface ** sprites, int num_sprites,
 player load_player();
 enemy load_enemy();
 
-void move_player(player * ship);
+void move_player(player * ship, int time);
 void move_enemy(enemy * enemy);
 void move_bullets(player * ship);
 

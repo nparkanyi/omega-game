@@ -16,8 +16,6 @@ int main ( int argc, char** argv )
     int running = 0;
     int direction = 0;
     int last_time = 0;
-    int current_time = 0;
-    int increment = 10;
     int sprite_num = 0;
 
     SDL_Surface * screen;
@@ -141,32 +139,19 @@ int main ( int argc, char** argv )
 
         }
 
-        current_time = SDL_GetTicks() - last_time;
-        if (current_time > 25){
-	        /* accommodates framerate; if framerate slower, ship moves further each frame. */
-	        increment = current_time / 30.0f * 20; 
-            
-            if (player.direction[3] == 1){
-                player.destrect.x -= increment;
-            }
-            if (player.direction[1] == 1){
-	            player.destrect.x += increment;
-            }
-            if (player.direction[2] == 1){
-	            player.destrect.y += increment;
-            }
-            if (player.direction[0] == 1){
-		        player.destrect.y -= increment;
-            } 
-        
-	        SDL_BlitSurface(background, NULL, drawbuff, NULL);
-            draw_player(&player, drawbuff);
+        move_player(&player, SDL_GetTicks() - last_time);
+        last_time = SDL_GetTicks();
 
-            /* update the screen */
-            SDL_BlitSurface(drawbuff, NULL, screen, NULL);
-            SDL_Flip(screen);
-            last_time = SDL_GetTicks();
-	    } 
+
+        /*** Drawing Routines ***/
+
+        SDL_BlitSurface(background, NULL, drawbuff, NULL);
+        draw_player(&player, drawbuff);
+
+        /* update the screen */
+        SDL_BlitSurface(drawbuff, NULL, screen, NULL);
+        SDL_Flip(screen);
+	     
     }
     delete_player(&player);
     SDL_FreeSurface(drawbuff);
