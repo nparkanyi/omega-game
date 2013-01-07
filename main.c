@@ -8,11 +8,13 @@
 #define SDLSFTYPE SDL_SWSURFACE|SDL_FULLSCREEN
 #endif
 #include <stdlib.h>
+#include <math.h>
 #include <SDL/SDL.h>
 #include "player.h"
 
 int main ( int argc, char** argv )
 {
+    int i;
     int running = 0;
     int direction = 0;
     int last_time = 0;
@@ -23,9 +25,13 @@ int main ( int argc, char** argv )
     SDL_Surface * drawbuff;
     SDL_Surface * bmp;
     SDL_Surface * background;
+    SDL_Surface * asteroid_sprite;
     SDL_Rect dstrect;
 
-    printf("%d\n", increment);
+    /* contains all the player attributes. */
+    player player;   
+    asteroid asteroids[7];
+
     /* start SDL's video functionality */
     if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 )
     {
@@ -42,11 +48,11 @@ int main ( int argc, char** argv )
     }
     SDL_ShowCursor(0);
 
-    /* contains all the player attributes. */
-    player player;
     player = load_player(screen);
-
-    
+    for (i = 0; i < 7; i++){
+        asteroids[i] = load_asteroid(asteroid_sprite);
+    }
+    asteroids[0].visible = 1;
 
     background = SDL_LoadBMP("img/background.bmp");
     if (background == NULL)
@@ -54,6 +60,15 @@ int main ( int argc, char** argv )
         printf("Unable to load bitmap: %s\n", SDL_GetError());
 	    return 1;
     }
+
+    asteroid_sprite = SDL_LoadBMP("img/asteroid.bmp");
+    if (asteroid_sprite == NULL)
+    {
+        printf("Unable to load bitmap: %s\n", SDL_GetError());
+	    return 1;
+    }
+
+    SDL_SetColorKey(asteroid_sprite, SDL_SRCCOLORKEY, SDL_MapRGB(screen->format, 255, 255, 255));
 
     drawbuff = SDL_CreateRGBSurface(SDLSFTYPE, 640, 480, 32, 0, 0, 0, 0);
 
@@ -147,6 +162,7 @@ int main ( int argc, char** argv )
 
         SDL_BlitSurface(background, NULL, drawbuff, NULL);
         draw_player(&player, drawbuff);
+        draw_asteroid(&asteroids[0], drawbuff);
 
         /* update the screen */
         SDL_BlitSurface(drawbuff, NULL, screen, NULL);

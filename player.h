@@ -21,6 +21,8 @@ typedef struct {
     /* 0 to 3 */
     int orientation;
     int colour;  
+    /* if 0, player not on screen*/
+    int visible;
     /* 4 directions for each of the ship's four colours */
     SDL_Surface * sprites[4][4];
     /* used for SDL blitting, contains the coordinates to blit to */
@@ -34,6 +36,12 @@ typedef struct {
  * enemies. */
 typedef player enemy;
 
+typedef struct{
+    SDL_Surface * sprite;
+    int visible;
+    SDL_Rect destrect;
+} asteroid;
+
 /* general function for loading series of numbered bitmaps into
  * sprites. */
 void load_sprite(SDL_Surface ** sprites, int num_sprites, 
@@ -43,12 +51,14 @@ void load_sprite(SDL_Surface ** sprites, int num_sprites,
  * load the necessary bitmaps */
 player load_player();
 enemy load_enemy();
+asteroid load_asteroid(SDL_Surface * sprite);
 
 void move_player(player * ship, int time);
 void move_enemy(enemy * enemy);
 void move_bullets(player * ship);
 
 void draw_player(player * ship, SDL_Surface * destbuff);
+void draw_asteroid(asteroid * asteroid, SDL_Surface * destbuff);
 void draw_enemy(enemy * enemy, SDL_Surface * destbuff);
 void draw_bullet(bullet * bul);
 

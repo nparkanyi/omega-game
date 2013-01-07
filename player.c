@@ -40,8 +40,23 @@ player load_player(SDL_Surface * format_surface)
     ship.destrect.w = 50;
     ship.destrect.h = 50;
 
+    ship.visible = 1;
+
     return ship;
 }    
+
+asteroid load_asteroid(SDL_Surface * sprite)
+{
+    int i;
+    asteroid asteroid;
+
+    asteroid.sprite = sprite;
+    asteroid.visible = 0;
+    asteroid.destrect.x = 0;
+    asteroid.destrect.y = 0;
+
+    return asteroid;
+}
 
 void move_player(player * ship, int time)
 {
@@ -54,10 +69,10 @@ void move_player(player * ship, int time)
         if (ship->direction[3] == 1){
             ship->destrect.x -= increment;
         }
-        if (ship->direction[1] == 1){
+        if (ship->direction[1] == 1 && ship->destrect.x < 600){
 	        ship->destrect.x += increment;
         }
-        if (ship->direction[2] == 1){
+        if (ship->direction[2] == 1 && ship->destrect.y < 440){
 	        ship->destrect.y += increment;
         }
         if (ship->direction[0] == 1){
@@ -68,6 +83,13 @@ void move_player(player * ship, int time)
 void draw_player(player * ship, SDL_Surface * destbuff)
 {
     SDL_BlitSurface(ship->sprites[ship->colour][ship->orientation], NULL, destbuff, &ship->destrect);
+}
+
+void draw_asteroid(asteroid * asteroid, SDL_Surface * destbuff)
+{
+    if (asteroid->visible == 1){
+        SDL_BlitSurface(asteroid->sprite, NULL, destbuff, &asteroid->destrect);
+    }
 }
 
 void delete_bullet(bullet * bul)
