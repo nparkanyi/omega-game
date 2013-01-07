@@ -42,19 +42,17 @@ typedef struct{
     SDL_Rect destrect;
 } asteroid;
 
-/* general function for loading series of numbered bitmaps into
- * sprites. */
-void load_sprite(SDL_Surface ** sprites, int num_sprites, 
-        const char * prefix, const char * postfix, SDL_Surface * format_surface);
+/* general function for loading series of numbered bitmaps into sprites. */
+void load_sprite(SDL_Surface ** sprites, int num_sprites, const char * prefix,
+        const char * postfix, SDL_Surface * format_surface);
 
-/* load_bullet and load_player initialize the structures and 
- * load the necessary bitmaps */
-player load_player();
-enemy load_enemy();
-asteroid load_asteroid(SDL_Surface * sprite);
+/* load_bullet and load_player initialize the structures and load the necessary
+ * bitmaps */
+player load_player(); enemy load_enemy(); asteroid load_asteroid(SDL_Surface *
+        sprite);
 
-void move_player(player * ship, int time);
-void move_enemy(enemy * enemy);
+void move_player(player * ship, int time); void move_enemy(enemy * enemy);
+void move_asteroid(asteroid * asteroid, int time);
 void move_bullets(player * ship);
 
 void draw_player(player * ship, SDL_Surface * destbuff);

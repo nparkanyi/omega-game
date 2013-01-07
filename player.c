@@ -2,6 +2,7 @@
  * Implements player functions. */
 
 #include <stdio.h>
+#include <math.h>
 #include <SDL/SDL.h>
 #include "player.h"
 
@@ -50,9 +51,10 @@ asteroid load_asteroid(SDL_Surface * sprite)
     int i;
     asteroid asteroid;
 
-    asteroid.sprite = sprite;
+    asteroid.sprite = SDL_LoadBMP("img/asteroid.bmp");
+    SDL_SetColorKey(asteroid.sprite, SDL_SRCCOLORKEY, SDL_MapRGB(sprite->format, 255, 255, 255));
     asteroid.visible = 0;
-    asteroid.destrect.x = 0;
+    asteroid.destrect.x = 320;
     asteroid.destrect.y = 0;
 
     return asteroid;
@@ -80,6 +82,25 @@ void move_player(player * ship, int time)
         } 
     }
 }
+
+void move_asteroid(asteroid * asteroid, int time)
+{
+    int increment_y;
+    static int increment_x = 1;
+    increment_y = time / 25.0f;
+
+    if (asteroid->visible == 1 && time > 25){
+        asteroid->destrect.y += increment_y;
+        asteroid->destrect.x = (int)(80 * cos(0.05f * asteroid->destrect.y) + 80);
+    }
+
+    if (asteroid->destrect.y >= 480){
+        //asteroid->visible = 0;
+        asteroid->destrect.y = 0;
+    }
+}
+
+
 void draw_player(player * ship, SDL_Surface * destbuff)
 {
     SDL_BlitSurface(ship->sprites[ship->colour][ship->orientation], NULL, destbuff, &ship->destrect);

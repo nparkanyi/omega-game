@@ -9,6 +9,7 @@
 #endif
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include <SDL/SDL.h>
 #include "player.h"
 
@@ -32,6 +33,9 @@ int main ( int argc, char** argv )
     player player;   
     asteroid asteroids[7];
 
+    /* random number seed */
+    srand(time(NULL));
+
     /* start SDL's video functionality */
     if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 )
     {
@@ -49,12 +53,15 @@ int main ( int argc, char** argv )
     SDL_ShowCursor(0);
 
     player = load_player(screen);
+
     for (i = 0; i < 7; i++){
-        asteroids[i] = load_asteroid(asteroid_sprite);
+        asteroids[i] = load_asteroid(screen);
     }
     asteroids[0].visible = 1;
+//    asteroids[0].destrect.x = 320;
+    printf("%d", (int)(rand() % 640));
 
-    background = SDL_LoadBMP("img/background.bmp");
+    background = SDL_LoadBMP("img/background2.bmp");
     if (background == NULL)
     {
         printf("Unable to load bitmap: %s\n", SDL_GetError());
@@ -155,6 +162,7 @@ int main ( int argc, char** argv )
         }
 
         move_player(&player, SDL_GetTicks() - last_time);
+        move_asteroid(&asteroids[0], SDL_GetTicks() - last_time);
         last_time = SDL_GetTicks();
 
 
