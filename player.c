@@ -25,15 +25,19 @@ player load_player(SDL_Surface * format_surface)
 
     for (i = 0; i < 10; i++){
         load_sprite(&ship.bullets[0][i].animation[0], 4, "img/bulletyellow", ".bmp", format_surface);
+	ship.bullets[0][i].visible = 0;
     }
     for (i = 0; i < 10; i++){
         load_sprite(&ship.bullets[1][i].animation[0], 4, "img/bulletred", ".bmp", format_surface);
+        ship.bullets[1][i].visible = 0;
     }
     for (i = 0; i < 10; i++){
         load_sprite(&ship.bullets[2][i].animation[0], 4, "img/bulletblue", ".bmp", format_surface);
+        ship.bullets[2][i].visible = 0;
     }
     for (i = 0; i < 10; i++){
         load_sprite(&ship.bullets[3][i].animation[0], 4, "img/bulletblack", ".bmp", format_surface);
+        ship.bullets[3][i].visible = 0;
     }
         
     ship.destrect.x = 20;
@@ -94,6 +98,7 @@ void move_asteroid(asteroid * asteroid, int time)
 
     if (asteroid->visible == 1){
         asteroid->destrect.y += increment_y;
+	/* move asteroid in a cosine curve. */
         asteroid->destrect.x = (int)(asteroid->amplitude * 
 	        cos(0.01f * asteroid->speed * asteroid->destrect.y) + asteroid->amplitude + asteroid->x_offset);
     }
@@ -104,6 +109,24 @@ void move_asteroid(asteroid * asteroid, int time)
     }
 }
 
+void move_bullets(player * ship, int time)
+{
+    int i, j;
+
+    for (j = 0; j < 4; j++){
+        for (i = 0; i < 10; i++){
+	    if (ship->bullets[j][i].visible == 1){
+	        ship->bullets[j][i].destrect.x += ship->bullets[j][i].direction_x * time / 30.0f;
+		ship->bullets[j][i].destrect.y += ship->bullets[j][i].direction_y * time / 30.0f;
+		
+		if (ship->bullets[j][i].destrect.x >= 640 || ship->bullets[j][i].destrect.x <= 1
+		        || ship->bullets[j][i].destrect.y >= 480 || ship->bullets[j][i].destrect.y <= 1){
+		    ship->bullets[j][i].visible = 0;
+		}
+	    }
+	}
+    }
+}
 
 void draw_player(player * ship, SDL_Surface * destbuff)
 {
@@ -116,6 +139,19 @@ void draw_asteroid(asteroid * asteroid, SDL_Surface * destbuff)
 {
     if (asteroid->visible == 1){
         SDL_BlitSurface(asteroid->sprite, NULL, destbuff, &asteroid->destrect);
+    }
+}
+
+void draw_bullet(player * ship, SDL_Surface * destbuff)
+{
+    int i, j;
+   
+    for (j = 0; j < 4; j++){
+        for (i = 0; i < 10; i++){
+	    if (ship->bullets[j][i].visible == 1){
+    	        SDL_BlitSurface(ship->bullets[j][i].animation[0], NULL, destbuff, &ship->bullets[j][i].destrect);
+	    }
+	}
     }
 }
 

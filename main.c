@@ -131,8 +131,43 @@ int main ( int argc, char** argv )
                                 player.colour++;
                             }
                             break;
-                    }
-			        break;
+			case SDLK_SPACE:
+			    /* player fires bullet. */
+			    for (i = 0; i < 10; i++){
+			        if (player.bullets[player.colour][i].visible == 0){
+				    player.bullets[player.colour][i].visible = 1;
+
+				    player.bullets[player.colour][i].destrect.x = player.destrect.x;
+				    player.bullets[player.colour][i].destrect.y = player.destrect.y;
+
+				    switch(player.orientation){
+					case 0:
+				        player.bullets[player.colour][i].direction_x = 0;
+					player.bullets[player.colour][i].direction_y = -10;
+				        break;
+
+					case 1:
+					player.bullets[player.colour][i].direction_x = 10;
+				        player.bullets[player.colour][i].direction_y = 0;
+				        break;
+
+				        case 2:
+				        player.bullets[player.colour][i].direction_x = 0;
+				        player.bullets[player.colour][i].direction_y = 10;
+				        break;
+
+				        case 3:
+				        player.bullets[player.colour][i].direction_x = -10;
+				        player.bullets[player.colour][i].direction_y = 0;
+				        break;	
+				    }
+				    break;
+				}
+			    }
+				    
+                        }
+     	                break;
+
 		        case SDL_KEYUP:
                     switch (event.key.keysym.sym){
                         case SDLK_DOWN:
@@ -156,7 +191,6 @@ int main ( int argc, char** argv )
 	/* this will occasionally make a new asteroid fly across the screen with random attributes.*/
 	i = rand() % 1000;
 	if (i < 10){
-	    printf("%d\n", i);
             for (i = 0; i < 7; i++){
 	        if (asteroids[i].visible == 0){
 		    asteroids[i].visible = 1;
@@ -171,6 +205,7 @@ int main ( int argc, char** argv )
 
 	/* code to move the game's actors around appropriately */
         move_player(&player, SDL_GetTicks() - last_time);
+	move_bullets(&player, SDL_GetTicks() - last_time);
 
 	for (i = 0; i < 7; i++){
             move_asteroid(&asteroids[i], SDL_GetTicks() - last_time);
@@ -197,6 +232,7 @@ int main ( int argc, char** argv )
 
         SDL_BlitSurface(background, NULL, drawbuff, NULL);
         draw_player(&player, drawbuff);
+	draw_bullet(&player, drawbuff);
 
 	for (i = 0; i < 7; i++){
             draw_asteroid(&asteroids[i], drawbuff);

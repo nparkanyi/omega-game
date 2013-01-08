@@ -9,7 +9,7 @@ typedef struct {
     /* these indicate the direction in which the bullet moves */
     int direction_x;
     int direction_y;
-    int speed;
+    int visible;
 } bullet;
 
 typedef struct {
@@ -56,12 +56,12 @@ player load_player(); enemy load_enemy(); asteroid load_asteroid(SDL_Surface *
 
 void move_player(player * ship, int time); void move_enemy(enemy * enemy);
 void move_asteroid(asteroid * asteroid, int time);
-void move_bullets(player * ship);
+void move_bullets(player * ship, int time);
 
 void draw_player(player * ship, SDL_Surface * destbuff);
 void draw_asteroid(asteroid * asteroid, SDL_Surface * destbuff);
 void draw_enemy(enemy * enemy, SDL_Surface * destbuff);
-void draw_bullet(bullet * bul);
+void draw_bullet(player * ship, SDL_Surface * destbuff);
 
 void delete_player(player * ship);
 void delete_enemy(enemy * enemy);
