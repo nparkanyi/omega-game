@@ -21,10 +21,10 @@ int main ( int argc, char** argv )
     int last_time = 0;
     int sprite_num = 0;
 
+    SDL_Event event;
     SDL_Surface * screen;
     /* buffer for double buffering */
     SDL_Surface * drawbuff;
-    SDL_Surface * bmp;
     SDL_Surface * background;
     SDL_Rect dstrect;
 
@@ -49,23 +49,16 @@ int main ( int argc, char** argv )
         printf("Unable to set 640x480 video: %s\n", SDL_GetError());
         return 1;
     }
+    /* hide the window's cursor, it looks awful in fullscreen. */
     SDL_ShowCursor(0);
 
     player = load_player(screen);
 
+
+    /* initialize all the asteroids */    
     for (i = 0; i < 7; i++){
         asteroids[i] = load_asteroid(screen);
-        asteroids[i].destrect.x = rand() % 640;
-        asteroids[i].x_offset = (rand() % 200) + 200;
-        asteroids[i].amplitude = (rand() % 500) + 1;
-        asteroids[i].speed = (rand() % 4) + 2;
     }
-    asteroids[0].visible = 1;
-    asteroids[1].visible = 1;
-    asteroids[0].destrect.x = rand() % 640;
-
-
-    printf("%d %d\n", asteroids[0].destrect.x, asteroids[1].destrect.x);
 
     background = SDL_LoadBMP("img/background2.bmp");
     if (background == NULL)
@@ -80,8 +73,8 @@ int main ( int argc, char** argv )
     dstrect.y = 20;
 
     while (running == 0){
-        SDL_Event event;
 
+	/* loop to ensure we handle all events. */
         while (SDL_PollEvent(&event))
         {
             switch (event.type)
@@ -97,6 +90,8 @@ int main ( int argc, char** argv )
                         case SDLK_ESCAPE:
                             running = 1;
                             break;
+			/* these will start the player moving in the proper direction when the 
+			 * associated key is pressed. */
                         case SDLK_DOWN:
                             player.direction[2] = 1;
                             break;
@@ -158,18 +153,42 @@ int main ( int argc, char** argv )
 
         }
 
+	/* this will occasionally make a new asteroid fly across the screen with random attributes.*/
+	i = rand() % 1000;
+	if (i < 10){
+	    printf("%d\n", i);
+            for (i = 0; i < 7; i++){
+	        if (asteroids[i].visible == 0){
+		    asteroids[i].visible = 1;
+                    asteroids[i].destrect.x = rand() % 640;
+                    asteroids[i].x_offset = (rand() % 640);
+                    asteroids[i].amplitude = (rand() % 320) + 1;
+                    asteroids[i].speed = (rand() % 4) + 2;
+		    break;
+                }
+	    }
+	}
+
+	/* code to move the game's actors around appropriately */
         move_player(&player, SDL_GetTicks() - last_time);
-        move_asteroid(&asteroids[0], SDL_GetTicks() - last_time);
-	move_asteroid(&asteroids[1], SDL_GetTicks() - last_time);
-	printf("%d %d\n", asteroids[0].destrect.x, asteroids[1].destrect.x);
+
+	for (i = 0; i < 7; i++){
+            move_asteroid(&asteroids[i], SDL_GetTicks() - last_time);
+	}
+
         last_time = SDL_GetTicks();
 
+
 	/*** Collision detection ***/
-	if (player.destrect.x > asteroids[1].destrect.x 
-	        && player.destrect.x < asteroids[1].destrect.x + 40){
-	    if (player.destrect.y > asteroids[1].destrect.y
-	            && player.destrect.y < asteroids[1].destrect.y + 60){
-                player.visible = 0;
+	/* checking if the player collided with one of the asteroids */
+	for (i = 0; i < 7; i++){
+  	    if (player.destrect.x > asteroids[i].destrect.x 
+	            && player.destrect.x < asteroids[i].destrect.x + 40
+		    && asteroids[i].visible == 1){
+	        if (player.destrect.y > asteroids[i].destrect.y
+	                && player.destrect.y < asteroids[i].destrect.y + 60){
+                    player.visible = 0;
+	        }
 	    }
 	}
 
@@ -178,15 +197,21 @@ int main ( int argc, char** argv )
 
         SDL_BlitSurface(background, NULL, drawbuff, NULL);
         draw_player(&player, drawbuff);
-        draw_asteroid(&asteroids[0], drawbuff);
-	draw_asteroid(&asteroids[1], drawbuff);
+
+	for (i = 0; i < 7; i++){
+            draw_asteroid(&asteroids[i], drawbuff);
+	}
 
         /* update the screen */
         SDL_BlitSurface(drawbuff, NULL, screen, NULL);
         SDL_Flip(screen);
 	     
     }
+
     delete_player(&player);
+    for (i = 0; i < 7; i++){
+        delete_asteroid(&asteroids[i]);
+    } 
     SDL_FreeSurface(drawbuff);
     SDL_FreeSurface(background);
     SDL_FreeSurface(screen);

@@ -99,8 +99,8 @@ void move_asteroid(asteroid * asteroid, int time)
     }
 
     if (asteroid->destrect.y >= 480){
-        //asteroid->visible = 0;
-        asteroid->destrect.y = 0;
+        asteroid->visible = 0;
+	asteroid->destrect.y = 0;
     }
 }
 
@@ -125,6 +125,11 @@ void delete_bullet(bullet * bul)
     for (i = 0; i < 4; i++){
         SDL_FreeSurface(bul->animation[i]);
     } 
+}
+
+void delete_asteroid(asteroid * asteroid)
+{
+    SDL_FreeSurface(asteroid->sprite);
 }
 
 void delete_player(player * ship)
