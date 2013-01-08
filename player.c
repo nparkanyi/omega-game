@@ -54,8 +54,11 @@ asteroid load_asteroid(SDL_Surface * sprite)
     asteroid.sprite = SDL_LoadBMP("img/asteroid.bmp");
     SDL_SetColorKey(asteroid.sprite, SDL_SRCCOLORKEY, SDL_MapRGB(sprite->format, 255, 255, 255));
     asteroid.visible = 0;
-    asteroid.destrect.x = 320;
-    asteroid.destrect.y = 0;
+    asteroid.speed = 3;
+    asteroid.x_offset = 320;
+    asteroid.amplitude = 200; 
+    asteroid.destrect.x = 320; 
+    asteroid.destrect.y =0;
 
     return asteroid;
 }
@@ -64,7 +67,7 @@ void move_player(player * ship, int time)
 {
     int increment;
 
-    if (time > 25){
+    if (ship->visible){
         /* accommodates framerate; if framerate is slower, ship moves further each frame. */
 	    increment = time / 30.0f * 8; 
             
@@ -78,7 +81,7 @@ void move_player(player * ship, int time)
 	        ship->destrect.y += increment;
         }
         if (ship->direction[0] == 1){
-		    ship->destrect.y -= increment;
+		ship->destrect.y -= increment;
         } 
     }
 }
@@ -87,11 +90,12 @@ void move_asteroid(asteroid * asteroid, int time)
 {
     int increment_y;
     static int increment_x = 1;
-    increment_y = time / 25.0f;
+    increment_y = time / 30.0f * asteroid->speed;
 
-    if (asteroid->visible == 1 && time > 25){
+    if (asteroid->visible == 1){
         asteroid->destrect.y += increment_y;
-        asteroid->destrect.x = (int)(80 * cos(0.05f * asteroid->destrect.y) + 80);
+        asteroid->destrect.x = (int)(asteroid->amplitude * 
+	        cos(0.01f * asteroid->speed * asteroid->destrect.y) + asteroid->amplitude + asteroid->x_offset);
     }
 
     if (asteroid->destrect.y >= 480){
@@ -103,7 +107,9 @@ void move_asteroid(asteroid * asteroid, int time)
 
 void draw_player(player * ship, SDL_Surface * destbuff)
 {
-    SDL_BlitSurface(ship->sprites[ship->colour][ship->orientation], NULL, destbuff, &ship->destrect);
+    if (ship->visible){
+        SDL_BlitSurface(ship->sprites[ship->colour][ship->orientation], NULL, destbuff, &ship->destrect);
+    }
 }
 
 void draw_asteroid(asteroid * asteroid, SDL_Surface * destbuff)

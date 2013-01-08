@@ -26,7 +26,6 @@ int main ( int argc, char** argv )
     SDL_Surface * drawbuff;
     SDL_Surface * bmp;
     SDL_Surface * background;
-    SDL_Surface * asteroid_sprite;
     SDL_Rect dstrect;
 
     /* contains all the player attributes. */
@@ -56,10 +55,17 @@ int main ( int argc, char** argv )
 
     for (i = 0; i < 7; i++){
         asteroids[i] = load_asteroid(screen);
+        asteroids[i].destrect.x = rand() % 640;
+        asteroids[i].x_offset = (rand() % 200) + 200;
+        asteroids[i].amplitude = (rand() % 500) + 1;
+        asteroids[i].speed = (rand() % 4) + 2;
     }
     asteroids[0].visible = 1;
-//    asteroids[0].destrect.x = 320;
-    printf("%d", (int)(rand() % 640));
+    asteroids[1].visible = 1;
+    asteroids[0].destrect.x = rand() % 640;
+
+
+    printf("%d %d\n", asteroids[0].destrect.x, asteroids[1].destrect.x);
 
     background = SDL_LoadBMP("img/background2.bmp");
     if (background == NULL)
@@ -67,15 +73,6 @@ int main ( int argc, char** argv )
         printf("Unable to load bitmap: %s\n", SDL_GetError());
 	    return 1;
     }
-
-    asteroid_sprite = SDL_LoadBMP("img/asteroid.bmp");
-    if (asteroid_sprite == NULL)
-    {
-        printf("Unable to load bitmap: %s\n", SDL_GetError());
-	    return 1;
-    }
-
-    SDL_SetColorKey(asteroid_sprite, SDL_SRCCOLORKEY, SDL_MapRGB(screen->format, 255, 255, 255));
 
     drawbuff = SDL_CreateRGBSurface(SDLSFTYPE, 640, 480, 32, 0, 0, 0, 0);
 
@@ -163,7 +160,18 @@ int main ( int argc, char** argv )
 
         move_player(&player, SDL_GetTicks() - last_time);
         move_asteroid(&asteroids[0], SDL_GetTicks() - last_time);
+	move_asteroid(&asteroids[1], SDL_GetTicks() - last_time);
+	printf("%d %d\n", asteroids[0].destrect.x, asteroids[1].destrect.x);
         last_time = SDL_GetTicks();
+
+	/*** Collision detection ***/
+	if (player.destrect.x > asteroids[1].destrect.x 
+	        && player.destrect.x < asteroids[1].destrect.x + 40){
+	    if (player.destrect.y > asteroids[1].destrect.y
+	            && player.destrect.y < asteroids[1].destrect.y + 60){
+                player.visible = 0;
+	    }
+	}
 
 
         /*** Drawing Routines ***/
@@ -171,6 +179,7 @@ int main ( int argc, char** argv )
         SDL_BlitSurface(background, NULL, drawbuff, NULL);
         draw_player(&player, drawbuff);
         draw_asteroid(&asteroids[0], drawbuff);
+	draw_asteroid(&asteroids[1], drawbuff);
 
         /* update the screen */
         SDL_BlitSurface(drawbuff, NULL, screen, NULL);
