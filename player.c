@@ -50,6 +50,27 @@ player load_player(SDL_Surface * format_surface)
     return ship;
 }    
 
+enemy load_enemy(const char * prefix, const char * bullet_prefix, SDL_Surface * format_surface)
+{
+    enemy enemy;
+    int i;
+
+    for (i = 0; i < 4; i++){
+        enemy.direction[i] = 0;
+    }
+    enemy.orientation = 0;
+    enemy.visible = 0;
+    
+    load_sprite(&enemy.sprites[0][0], 1, prefix, ".bmp", format_surface);
+
+    for (i = 0; i < 10; i++){
+        load_sprite(&enemy.bullets[0][i].animation[0], 4, bullet_prefix, ".bmp", format_surface);
+	enemy.bullets[0][i].visible = 0;
+    }
+    
+    return enemy;
+}
+    
 asteroid load_asteroid(SDL_Surface * sprite)
 {
     int i;
@@ -90,6 +111,38 @@ void move_player(player * ship, int time)
     }
 }
 
+void move_enemy(enemy * enemy, int player_x, int player_y, int time)
+{
+    int increment;
+    int x_move;
+    int y_move;
+    
+    if (enemy->visible){
+        increment = time / 30.0f * enemy->speed;
+
+	y_move = (int)((player_y - enemy->destrect.y) / 50.0f);
+	x_move = (int)((player_x - enemy->destrect.x) / 50.0f);
+
+	/*if (y_move == 0){
+	    y_move = 1;
+	}
+	else if (x_move == 0){
+	    x_move = 1;
+	}*/
+
+	/*if (player_y < enemy->destrect.y){
+	    y_move *= -1;
+	}
+	if (player_x < enemy->destrect.x){
+	    x_move *= -1;
+	}*/
+
+	printf("%d %d\n", x_move, y_move);
+	enemy->destrect.x += x_move * increment;
+	enemy->destrect.y += y_move * increment;
+    }
+}
+    	
 void move_asteroid(asteroid * asteroid, int time)
 {
     int increment_y;
@@ -133,6 +186,11 @@ void draw_player(player * ship, SDL_Surface * destbuff)
     if (ship->visible){
         SDL_BlitSurface(ship->sprites[ship->colour][ship->orientation], NULL, destbuff, &ship->destrect);
     }
+}
+
+void draw_enemy(enemy * enemy, SDL_Surface * destbuff)
+{
+    draw_player(enemy, destbuff);
 }
 
 void draw_asteroid(asteroid * asteroid, SDL_Surface * destbuff)

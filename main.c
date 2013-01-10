@@ -13,6 +13,9 @@
 #include <SDL/SDL.h>
 #include "player.h"
 
+/* a general function for determining collision given coordinates and the sizes of the bounding boxes. */
+int collision(int ax, int bx, int ay, int by, int a_size_x, int b_size_x, int a_size_y, int b_size_y);
+
 int main ( int argc, char** argv )
 {
     int i;
@@ -33,6 +36,8 @@ int main ( int argc, char** argv )
 
     /* contains all the player attributes. */
     player player;   
+    /* up to 10 enemies of each colour on screen at once. */
+    enemy enemies[4][10];
     asteroid asteroids[7];
     /* contains the five frames of the explosion animation. */
     SDL_Surface * explosion[5];
@@ -59,6 +64,24 @@ int main ( int argc, char** argv )
 
     player = load_player(screen);
 
+    /* load the enemies of each colour. */
+    for (i = 0; i < 10; i++){
+        enemies[YELLOW][i] = load_enemy("img/enemyyellow", "img/bulletyellow", screen);
+    }
+    for (i = 0; i < 10; i++){
+        enemies[RED][i] = load_enemy("img/enemyred", "img/bulletred", screen);
+    }
+    for (i = 0; i < 10; i++){
+	enemies[BLUE][i] = load_enemy("img/enemyblue", "img/bulletblue", screen);
+    }
+    for (i = 0; i < 10; i++){
+        enemies[BLACK][i] = load_enemy("img/enemyblack", "img/bulletblack", screen);
+    }
+    
+    enemies[YELLOW][0].visible = 1;
+    enemies[YELLOW][0].speed = 2;
+    enemies[YELLOW][0].destrect.x = 600;
+    enemies[YELLOW][0].destrect.y = 400;
 
     /* initialize all the asteroids */    
     for (i = 0; i < 7; i++){
@@ -228,6 +251,7 @@ int main ( int argc, char** argv )
 	/* code to move the game's actors around appropriately */
         move_player(&player, SDL_GetTicks() - last_time);
 	move_bullets(&player, SDL_GetTicks() - last_time);
+	move_enemy(&enemies[YELLOW][0], player.destrect.x, player.destrect.y, SDL_GetTicks() - last_time);
 
 	for (i = 0; i < 7; i++){
             move_asteroid(&asteroids[i], SDL_GetTicks() - last_time);
@@ -239,32 +263,30 @@ int main ( int argc, char** argv )
 	/*** Collision detection ***/
 	/* checking if the player collided with one of the asteroids */
 	for (i = 0; i < 7; i++){
-	    /* check player's upper left corner. */
-  	    if (player.destrect.x > asteroids[i].destrect.x 
-	            && player.destrect.x < asteroids[i].destrect.x + 40
-		    && asteroids[i].visible == 1){
-	        if (player.destrect.y > asteroids[i].destrect.y
-	                && player.destrect.y < asteroids[i].destrect.y + 49){
-                    player.visible = 0;
-	        }
-	    }
-	    /* check player's lower right corner. */
-	    if (player.destrect.x + 40 > asteroids[i].destrect.x
-	            && player.destrect.x + 40 < asteroids[i].destrect.x + 40
-		    && asteroids[i].visible == 1){
-                if (player.destrect.y + 40 > asteroids[i].destrect.y
-		        && player.destrect.y + 40 < asteroids[i].destrect.y + 49){
-		    player.visible = 0;
-		}
+	    if (collision(player.destrect.x, asteroids[i].destrect.x, player.destrect.y, asteroids[i].destrect.y,
+	            40, 40, 40, 49) && asteroids[i].visible == 1){
+	        player.visible = 0;    
 	    }
 	}
 
+	if (collision(player.destrect.x, enemies[YELLOW][0].destrect.x, player.destrect.y, enemies[YELLOW][0].destrect.y,
+	        40, 40, 40, 40) == 1 && enemies[YELLOW][0].visible == 1){
+	    player.visible = 0;
+	}
+
+	for (i = 0; i < 10; i++){
+            if (collision(player.bullets[YELLOW][i].destrect.x, enemies[YELLOW][0].destrect.x, player.bullets[YELLOW][i].destrect.y, 
+	            enemies[YELLOW][0].destrect.y, 40, 30, 40, 30) == 1 && player.bullets[YELLOW][i].visible == 1){
+	        enemies[YELLOW][0].visible = 0;
+	    }
+	}
 
         /*** Drawing Routines ***/
 
         SDL_BlitSurface(background, NULL, drawbuff, NULL);
         draw_player(&player, drawbuff);
 	draw_bullet(&player, drawbuff);
+        draw_enemy(&enemies[YELLOW][0], drawbuff);
 
 	for (i = 0; i < 7; i++){
             draw_asteroid(&asteroids[i], drawbuff);
@@ -291,4 +313,24 @@ int main ( int argc, char** argv )
     SDL_Quit();
 
     return (0);
+}
+
+
+int collision(int ax, int bx, int ay, int by, int a_size_x, int b_size_x, int a_size_y, int b_size_y)
+{
+    /* check upper left corner. */
+    if (ax >= bx && ax <= bx + b_size_x
+            && ay >= by && ay <= by + b_size_y){
+	    return 1;
+    } 	
+    
+    /* check lower right corner. */
+    else if (ax + a_size_x >= bx && ax + a_size_x <= bx + b_size_x 
+            && ay + a_size_y >= by && ay + a_size_y <= by + b_size_y){
+	    return 1;
+    }
+    
+    else{
+        return 0;
+    }
 }

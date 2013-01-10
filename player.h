@@ -21,6 +21,12 @@ typedef struct {
     /* 0 to 3 */
     int orientation;
     int colour;  
+    /* only used for the enemy bullet timing */
+    int time;
+    /* only for enemies, frequency of gunfire */
+    int frequency;
+    /* only enemies, speed of movement */
+    int speed;
     /* if 0, player not on screen*/
     int visible;
     /* 4 directions for each of the ship's four colours */
@@ -46,15 +52,16 @@ typedef struct{
 } asteroid;
 
 /* general function for loading series of numbered bitmaps into sprites. */
-void load_sprite(SDL_Surface ** sprites, int num_sprites, const char * prefix,
-        const char * postfix, SDL_Surface * format_surface);
+void load_sprite(SDL_Surface ** sprites, int num_sprites, const char * prefix, const char * postfix, SDL_Surface * format_surface);
 
 /* load_bullet and load_player initialize the structures and load the necessary
  * bitmaps */
-player load_player(); enemy load_enemy(); asteroid load_asteroid(SDL_Surface *
-        sprite);
+player load_player(SDL_Surface * format_surface); 
+enemy load_enemy(const char * prefix, const char * bullet_prefix, SDL_Surface * format_surface); 
+asteroid load_asteroid(SDL_Surface * sprite);
 
-void move_player(player * ship, int time); void move_enemy(enemy * enemy);
+void move_player(player * ship, int time); 
+void move_enemy(enemy * enemy, int player_x, int player_y, int time);
 void move_asteroid(asteroid * asteroid, int time);
 void move_bullets(player * ship, int time);
 
@@ -65,4 +72,3 @@ void draw_bullet(player * ship, SDL_Surface * destbuff);
 
 void delete_player(player * ship);
 void delete_enemy(enemy * enemy);
-void delete_bullet(bullet * bul);
