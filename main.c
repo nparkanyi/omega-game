@@ -31,6 +31,8 @@ int main ( int argc, char** argv )
     /* contains all the player attributes. */
     player player;   
     asteroid asteroids[7];
+    /* contains the five frames of the explosion animation. */
+    SDL_Surface * explosion[5];
 
     /* random number seed */
     srand(time(NULL));
@@ -59,6 +61,9 @@ int main ( int argc, char** argv )
     for (i = 0; i < 7; i++){
         asteroids[i] = load_asteroid(screen);
     }
+
+    /* load the explosion sprites. */
+    load_sprite(&explosion[0], 5, "img/explode", ".bmp", screen);
 
     background = SDL_LoadBMP("img/background2.bmp");
     if (background == NULL)
@@ -188,9 +193,21 @@ int main ( int argc, char** argv )
 
         }
 
+	/* play the player death animation if the player has been set as invisible. */
+	if (player.visible == 0){
+	    for (i = 0; i < 5; i++){
+	        SDL_BlitSurface(explosion[i], NULL, screen, &player.destrect);
+                SDL_Flip(screen);
+		SDL_Delay(125);
+	    }
+	    SDL_Delay(500);
+	    /* quit the game */
+	    running = 1;
+	}
+
 	/* this will occasionally make a new asteroid fly across the screen with random attributes.*/
-	i = rand() % 1000;
-	if (i < 10){
+	i = rand() % 1000; 
+	if (i < SDL_GetTicks() / 250.0f){
             for (i = 0; i < 7; i++){
 	        if (asteroids[i].visible == 0){
 		    asteroids[i].visible = 1;
@@ -217,13 +234,23 @@ int main ( int argc, char** argv )
 	/*** Collision detection ***/
 	/* checking if the player collided with one of the asteroids */
 	for (i = 0; i < 7; i++){
+	    /* check player's upper left corner. */
   	    if (player.destrect.x > asteroids[i].destrect.x 
 	            && player.destrect.x < asteroids[i].destrect.x + 40
 		    && asteroids[i].visible == 1){
 	        if (player.destrect.y > asteroids[i].destrect.y
-	                && player.destrect.y < asteroids[i].destrect.y + 60){
+	                && player.destrect.y < asteroids[i].destrect.y + 49){
                     player.visible = 0;
 	        }
+	    }
+	    /* check player's lower right corner. */
+	    if (player.destrect.x + 50 > asteroids[i].destrect.x
+	            && player.destrect.x + 50 < asteroids[i].destrect.x + 40
+		    && asteroids[i].visible == 1){
+                if (player.destrect.y + 50 > asteroids[i].destrect.y
+		        && player.destrect.y + 50 < asteroids[i].destrect.y + 49){
+		    player.visible = 0;
+		}
 	    }
 	}
 
@@ -238,7 +265,7 @@ int main ( int argc, char** argv )
             draw_asteroid(&asteroids[i], drawbuff);
 	}
 
-        /* update the screen */
+        /* update the screen, using double buffering. */
         SDL_BlitSurface(drawbuff, NULL, screen, NULL);
         SDL_Flip(screen);
 	     
@@ -248,6 +275,11 @@ int main ( int argc, char** argv )
     for (i = 0; i < 7; i++){
         delete_asteroid(&asteroids[i]);
     } 
+
+    for (i = 0; i < 5; i++){
+        SDL_FreeSurface(explosion[i]);
+    }
+
     SDL_FreeSurface(drawbuff);
     SDL_FreeSurface(background);
     SDL_FreeSurface(screen);
