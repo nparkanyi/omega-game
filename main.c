@@ -18,7 +18,10 @@ int main ( int argc, char** argv )
     int i;
     int running = 0;
     int direction = 0;
+    /* used for checking the time for the time-based rendering. */
     int last_time = 0;
+    /* indicates time passed since an asteroid may have been drawn. */
+    int asteroid_time = 0;
     int sprite_num = 0;
 
     SDL_Event event;
@@ -142,8 +145,8 @@ int main ( int argc, char** argv )
 			        if (player.bullets[player.colour][i].visible == 0){
 				    player.bullets[player.colour][i].visible = 1;
 
-				    player.bullets[player.colour][i].destrect.x = player.destrect.x;
-				    player.bullets[player.colour][i].destrect.y = player.destrect.y;
+				    player.bullets[player.colour][i].destrect.x = player.destrect.x + 20;
+				    player.bullets[player.colour][i].destrect.y = player.destrect.y + 20;
 
 				    switch(player.orientation){
 					case 0:
@@ -206,8 +209,9 @@ int main ( int argc, char** argv )
 	}
 
 	/* this will occasionally make a new asteroid fly across the screen with random attributes.*/
-	i = rand() % 1000; 
-	if (i < SDL_GetTicks() / 250.0f){
+	i = rand() % 100; 
+	if (i < 10 && SDL_GetTicks() - asteroid_time > 5000){
+	    asteroid_time = SDL_GetTicks();
             for (i = 0; i < 7; i++){
 	        if (asteroids[i].visible == 0){
 		    asteroids[i].visible = 1;
@@ -219,6 +223,7 @@ int main ( int argc, char** argv )
                 }
 	    }
 	}
+
 
 	/* code to move the game's actors around appropriately */
         move_player(&player, SDL_GetTicks() - last_time);
@@ -244,11 +249,11 @@ int main ( int argc, char** argv )
 	        }
 	    }
 	    /* check player's lower right corner. */
-	    if (player.destrect.x + 50 > asteroids[i].destrect.x
-	            && player.destrect.x + 50 < asteroids[i].destrect.x + 40
+	    if (player.destrect.x + 40 > asteroids[i].destrect.x
+	            && player.destrect.x + 40 < asteroids[i].destrect.x + 40
 		    && asteroids[i].visible == 1){
-                if (player.destrect.y + 50 > asteroids[i].destrect.y
-		        && player.destrect.y + 50 < asteroids[i].destrect.y + 49){
+                if (player.destrect.y + 40 > asteroids[i].destrect.y
+		        && player.destrect.y + 40 < asteroids[i].destrect.y + 49){
 		    player.visible = 0;
 		}
 	    }
