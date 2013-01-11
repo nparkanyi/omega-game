@@ -28,6 +28,7 @@ typedef struct {
     /* only enemies, speed of movement */
     int speed;
     /* if 0, player not on screen*/
+    /* if 3 in enemy, plays explosion animation. */
     int visible;
     /* 4 directions for each of the ship's four colours */
     SDL_Surface * sprites[4][4];

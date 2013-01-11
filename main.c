@@ -26,6 +26,8 @@ int main ( int argc, char** argv )
     /* indicates time passed since an asteroid may have been drawn. */
     int asteroid_time = 0;
     int sprite_num = 0;
+    int explosion_time = 0;
+    int explosion_number = 0;
 
     SDL_Event event;
     SDL_Surface * screen;
@@ -251,7 +253,7 @@ int main ( int argc, char** argv )
                 j = rand() % 4;
 	        if (enemies[j][i].visible == 0){
 	            enemies[j][i].visible = 1;
-	            enemies[j][i].speed = 2;
+	            enemies[j][i].speed = rand() % 7 + 1;
                     enemies[j][i].destrect.x = rand() % 640;
                     enemies[j][i].destrect.y = rand() % 400;
                     break;
@@ -302,7 +304,8 @@ int main ( int argc, char** argv )
             for ( j = 0; j < 4; j++){
                 if (collision(player.bullets[j][i].destrect.x, enemies[j][i].destrect.x, player.bullets[j][i].destrect.y,
 	                    enemies[j][i].destrect.y, 10, 35, 10, 35) == 1 && player.bullets[j][i].visible == 1){
-	                enemies[j][i].visible = 0;
+	                enemies[j][i].visible = 3;
+			player.bullets[j][i].visible = 0;
 	        }
 	    }
 	}
@@ -315,7 +318,22 @@ int main ( int argc, char** argv )
 
     for (j = 0; j < 4; j++){
         for (i = 0; i < 10; i++){
-            draw_enemy(&enemies[j][i], drawbuff);
+	    if (enemies[j][i].visible == 3){
+	        if ( SDL_GetTicks() - explosion_time > 250){
+		    if ( explosion_number != 5){
+		         explosion_number++;
+		    }
+		    else{
+		        explosion_number = 0;
+			enemies[j][i].visible = 0;
+		    }
+		    SDL_BlitSurface(explosion[explosion_number], NULL, drawbuff, &enemies[j][i].destrect);
+		    explosion_time = SDL_GetTicks();
+		}
+	    }
+	    else {
+                draw_enemy(&enemies[j][i], drawbuff);
+	    }
         }
     }
 
