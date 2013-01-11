@@ -230,31 +230,31 @@ int main ( int argc, char** argv )
 
 	i = rand() % 100;
 	/* this will occasionally make a new asteroid fly across the screen with random attributes.*/
-	if (i < 10 && SDL_GetTicks() - asteroid_time > 200){
+	if (i < 10 && SDL_GetTicks() - asteroid_time > 5000){
             for (i = 0; i < 7; i++){
 	            if (asteroids[i].visible == 0 && i < 2){
-		            asteroids[i].visible = 1;
+		    asteroids[i].visible = 1;
                     asteroids[i].destrect.x = rand() % 640;
                     asteroids[i].x_offset = (rand() % 640);
                     asteroids[i].amplitude = (rand() % 320) + 1;
                     asteroids[i].speed = (rand() % 4) + 2;
-		            asteroid_time = SDL_GetTicks();
-		            break;
+		    asteroid_time = SDL_GetTicks();
+		    break;
                 }
 	    }
 	}
 
-    /* randomly add enemies */
-    i = rand() % 200;
+        /* randomly add enemies */
+        i = rand() % 1000;
 	if (i < 10 && SDL_GetTicks() - asteroid_time > 500){
 	    for (i = 0; i < 10; i++){
-            j = rand() % 4;
+                j = rand() % 4;
 	        if (enemies[j][i].visible == 0){
 	            enemies[j][i].visible = 1;
 	            enemies[j][i].speed = 2;
-                enemies[j][i].destrect.x = rand() % 640;
-                enemies[j][i].destrect.y = rand() % 400;
-                break;
+                    enemies[j][i].destrect.x = rand() % 640;
+                    enemies[j][i].destrect.y = rand() % 400;
+                    break;
 	        }
 	    }
 	    asteroid_time = SDL_GetTicks();
@@ -263,17 +263,17 @@ int main ( int argc, char** argv )
 
 
 	/* code to move the game's actors around appropriately */
-    move_player(&player, SDL_GetTicks() - last_time);
+        move_player(&player, SDL_GetTicks() - last_time);
 	move_bullets(&player, SDL_GetTicks() - last_time);
 
 	for (j = 0; j < 4; j++){
-        for (i = 0; i < 10; i++){
-            move_enemy(&enemies[j][i], player.destrect.x, player.destrect.y, SDL_GetTicks() - last_time);
+            for (i = 0; i < 10; i++){
+                move_enemy(&enemies[j][i], player.destrect.x, player.destrect.y, SDL_GetTicks() - last_time);
+            }
         }
-	}
 
 	for (i = 0; i < 7; i++){
-        move_asteroid(&asteroids[i], SDL_GetTicks() - last_time);
+            move_asteroid(&asteroids[i], SDL_GetTicks() - last_time);
 	}
 
     last_time = SDL_GetTicks();
@@ -294,15 +294,15 @@ int main ( int argc, char** argv )
 	        if (collision(player.destrect.x, enemies[j][i].destrect.x, player.destrect.y, enemies[j][i].destrect.y,
 	                40, 40, 40, 40) == 1 && enemies[j][i].visible == 1){
 	            player.visible = 0;
-            }
+                }
 	    }
 	}
 
 	for (i = 0; i < 10; i++){
-        for ( j = 0; j < 4; j++){
-            if (collision(player.bullets[j][i].destrect.x, enemies[j][i].destrect.x, player.bullets[j][i].destrect.y,
-	                enemies[j][i].destrect.y, 40, 30, 40, 30) == 1 && player.bullets[j][i].visible == 1){
-	            enemies[j][i].visible = 0;
+            for ( j = 0; j < 4; j++){
+                if (collision(player.bullets[j][i].destrect.x, enemies[j][i].destrect.x, player.bullets[j][i].destrect.y,
+	                    enemies[j][i].destrect.y, 10, 35, 10, 35) == 1 && player.bullets[j][i].visible == 1){
+	                enemies[j][i].visible = 0;
 	        }
 	    }
 	}
@@ -351,17 +351,28 @@ int collision(int ax, int bx, int ay, int by, int a_size_x, int b_size_x, int a_
 {
     /* check upper left corner. */
     if (ax >= bx && ax <= bx + b_size_x
-            && ay >= by && ay <= by + b_size_y){
-	    return 1;
+            && ay > by && ay <= by + b_size_y){
+	return 1;
     }
 
-    /* check lower right corner. */
     else if (ax + a_size_x >= bx && ax + a_size_x <= bx + b_size_x
             && ay + a_size_y >= by && ay + a_size_y <= by + b_size_y){
 	    return 1;
     }
 
+    else if (ax + a_size_x >= bx && ax + a_size_x <= bx + b_size_x
+            && ay >= by && ay <= by + b_size_y){
+	    return 1;
+    }
+
+    else if (ax  >= bx && ax <= bx + b_size_x
+            && ay + a_size_y >= by && ay + a_size_y <= by + b_size_y){
+	    return 1;
+    }
+    
+    
     else{
         return 0;
     }
 }
+
