@@ -249,7 +249,7 @@ int main ( int argc, char** argv )
                     asteroids[i].destrect.x = 320;
                     asteroids[i].x_offset = (rand() % 320);
                     asteroids[i].amplitude = (rand() % 320) + 1;
-                    asteroids[i].speed = (rand() % 4) + 3;
+                    asteroids[i].speed = (rand() % 1) + 3;
 		            asteroid_time = SDL_GetTicks();
 		            break;
                 }
