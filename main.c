@@ -21,6 +21,7 @@ int main ( int argc, char** argv )
     int i, j, k;
     int running = 0;
     int direction = 0;
+    int game_start = 0;
     /* used for checking the time for the time-based rendering. */
     int last_time = 0;
     /* indicates time passed since an asteroid may have been drawn. */
@@ -103,6 +104,7 @@ int main ( int argc, char** argv )
     dstrect.x = 20;
     dstrect.y = 20;
 
+    game_start = SDL_GetTicks();
 
 /* ********* Main Game Loop **********/
     while (running == 0){
@@ -221,12 +223,12 @@ int main ( int argc, char** argv )
 
         }
 
-	difficulty = (int)(10000 / ((float)SDL_GetTicks() / 10000.0f + 1));
+	difficulty = (int)(10000 / ((float)SDL_GetTicks() / 1000.0f + 1));
     if (difficulty == 0){
         difficulty = 1;
     }
 
-	printf("DIFFICULT: %d \n", difficulty);
+	//printf("DIFFICULT: %d \n", difficulty);
 
 	/* play the player death animation if the player has been set as invisible. */
 	if (player.visible == 0){
@@ -249,7 +251,7 @@ int main ( int argc, char** argv )
                     asteroids[i].destrect.x = 320;
                     asteroids[i].x_offset = (rand() % 320);
                     asteroids[i].amplitude = (rand() % 320) + 1;
-                    asteroids[i].speed = (rand() % 1) + 3;
+                    asteroids[i].speed = (rand() % 5) + 3;
 		            asteroid_time = SDL_GetTicks();
 		            break;
                 }
@@ -361,6 +363,8 @@ int main ( int argc, char** argv )
 
     }
 
+    printf("\nYour score is: %d seconds. \n", (int)((SDL_GetTicks() - game_start) / 1000.0f));
+
 
     delete_player(&player);
     for (i = 0; i < 7; i++){
@@ -389,30 +393,3 @@ int collision(int ax, int bx, int ay, int by, int a_size_x, int b_size_x, int a_
         return 1;
     }
 }
-    /* check upper left corner. 
-    if (ax >= bx && ax <= bx + b_size_x
-            && ay > by && ay <= by + b_size_y){
-	return 1;
-    }
-
-    else if (ax + a_size_x >= bx && ax + a_size_x <= bx + b_size_x
-            && ay + a_size_y >= by && ay + a_size_y <= by + b_size_y){
-	    return 1;
-    }
-
-    else if (ax + a_size_x >= bx && ax + a_size_x <= bx + b_size_x
-            && ay >= by && ay <= by + b_size_y){
-	    return 1;
-    }
-
-    else if (ax  >= bx && ax <= bx + b_size_x
-            && ay + a_size_y >= by && ay + a_size_y <= by + b_size_y){
-	    return 1;
-    }
-
-    else{
-        return 0;
-    }
-    */
-
-
