@@ -385,3 +385,33 @@
 	"begin_code.h"
 	"close_code.h"
 
+1357828490 source:d:\omegabetatest\omega.tar\omega\player.c
+	<stdio.h>
+	<math.h>
+	<SDL/SDL.h>
+	"player.h"
+
+1357802063 d:\omegabetatest\omega.tar\omega\player.h
+
+1357829378 source:d:\omegabetatest\omega.tar\omega\main.c
+	<stdlib.h>
+	<math.h>
+	<time.h>
+	<SDL/SDL.h>
+	"player.h"
+
+1358263821 source:d:\omegabeta\player.c
+	<stdio.h>
+	<math.h>
+	<SDL/SDL.h>
+	"player.h"
+
+1357882276 d:\omegabeta\player.h
+
+1358266437 source:d:\omegabeta\main.c
+	<stdlib.h>
+	<math.h>
+	<time.h>
+	<SDL/SDL.h>
+	"player.h"
+

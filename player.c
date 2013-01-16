@@ -117,7 +117,7 @@ void move_enemy(enemy * enemy, int player_x, int player_y, int time)
     int x_move;
     int y_move;
 
-    if (enemy->visible){
+    if (enemy->visible == 1){
         increment = (int)(time / 30.0f * enemy->speed);
 
 	y_move = (int)((player_y - enemy->destrect.y) / 50.0f);
@@ -149,7 +149,7 @@ void move_asteroid(asteroid * asteroid, int time)
         asteroid->destrect.y += increment_y;
 	/* move asteroid in a cosine curve. */
         asteroid->destrect.x = (int)(asteroid->amplitude *
-	        cos(0.01f * asteroid->speed * asteroid->destrect.y) + asteroid->amplitude + asteroid->x_offset);
+	        sin(0.01f * asteroid->speed * asteroid->destrect.y) + asteroid->amplitude + asteroid->x_offset);
     }
 
     if (asteroid->destrect.y >= 480){
