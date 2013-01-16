@@ -5,7 +5,7 @@
  * to be hardware instead of software (can be problematic on some systems, so it's
  * not the default) */
 #ifndef SDLSFTYPE
-#define SDLSFTYPE SDL_SWSURFACE
+#define SDLSFTYPE SDL_SWSURFACE|SDL_FULLSCREEN
 #endif
 #include <stdlib.h>
 #include <math.h>
@@ -221,8 +221,12 @@ int main ( int argc, char** argv )
 
         }
 
-	difficulty = (int)(difficulty / SDL_GetTicks() / 10000);
-	printf("DIFFICULT: %d", difficulty);
+	difficulty = (int)(10000 / ((float)SDL_GetTicks() / 1000.0f + 1));
+    if (difficulty == 0){
+        difficulty = 1;
+    }
+
+	printf("DIFFICULT: %d \n", difficulty);
 
 	/* play the player death animation if the player has been set as invisible. */
 	if (player.visible == 0){
@@ -284,7 +288,7 @@ int main ( int argc, char** argv )
             move_asteroid(&asteroids[i], SDL_GetTicks() - last_time);
 	}
 
-    last_time = SDL_GetTicks();
+        last_time = SDL_GetTicks();
 
 
 	/*** Collision detection ***/
@@ -309,11 +313,11 @@ int main ( int argc, char** argv )
 	for (i = 0; i < 10; i++){
             for ( j = 0; j < 4; j++){
                 if (collision(player.bullets[j][i].destrect.x, enemies[j][i].destrect.x, player.bullets[j][i].destrect.y,
-	                    enemies[j][i].destrect.y, 10, 35, 10, 35) == 1 && player.bullets[j][i].visible == 1){
+	                    enemies[j][i].destrect.y, 10, 35, 10, 35) == 1 && player.bullets[j][i].visible == 1 && enemies[j][i].visible == 1){
 	                enemies[j][i].visible = 3;
-			player.bullets[j][i].visible = 0;
+			        player.bullets[j][i].visible = 0;
+	            }
 	        }
-	    }
 	}
 
     /*** Drawing Routines ***/
@@ -325,29 +329,30 @@ int main ( int argc, char** argv )
     for (j = 0; j < 4; j++){
         for (i = 0; i < 10; i++){
 
-	    if (enemies[j][i].visible == 3){
-	        if ( SDL_GetTicks() - explosion_time > 50){
-		        if ( explosion_number < 3){
-                    explosion_number++;
-		        }
-		    else{
-			    enemies[j][i].visible = 0;
-			    explosion_number = 0;
-			    break;
-		    }
+	        if (enemies[j][i].visible == 3){
+	            if ( SDL_GetTicks() - explosion_time > 50){
+		            if ( explosion_number < 3){
+                        explosion_number++;
+		            }
+		            else{
+	                    enemies[j][i].visible = 0;
+		                explosion_number = 0;
+		                break;
+	                }
 
-		    explosion_time = SDL_GetTicks();
-		    }
-            SDL_BlitSurface(explosion[explosion_number], NULL, drawbuff, &enemies[j][i].destrect);
-	    }
-	    else {
-            draw_enemy(&enemies[j][i], drawbuff);
-	    }
+		            explosion_time = SDL_GetTicks();
+		        }
+
+                SDL_BlitSurface(explosion[explosion_number], NULL, drawbuff, &enemies[j][i].destrect);
+	        }
+	        else {
+                draw_enemy(&enemies[j][i], drawbuff);
+	        }
         }
     }
 
 	for (i = 0; i < 7; i++){
-            draw_asteroid(&asteroids[i], drawbuff);
+        draw_asteroid(&asteroids[i], drawbuff);
 	}
 
         /* update the screen, using double buffering. */

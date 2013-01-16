@@ -65,7 +65,7 @@ enemy load_enemy(const char * prefix, const char * bullet_prefix, SDL_Surface * 
 
     for (i = 0; i < 10; i++){
         load_sprite(&enemy.bullets[0][i].animation[0], 4, bullet_prefix, ".bmp", format_surface);
-	enemy.bullets[0][i].visible = 0;
+	    enemy.bullets[0][i].visible = 0;
     }
 
     return enemy;
@@ -130,7 +130,6 @@ void move_enemy(enemy * enemy, int player_x, int player_y, int time)
 	    x_move *= -1;
 	}*/
 
-	printf("%d %d %d\n", x_move, y_move, increment);
 	if (increment == 0){
 	    increment = 1;
     }
