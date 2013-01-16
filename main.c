@@ -221,7 +221,7 @@ int main ( int argc, char** argv )
 
         }
 
-	difficulty = (int)(10000 / ((float)SDL_GetTicks() / 1000.0f + 1));
+	difficulty = (int)(10000 / ((float)SDL_GetTicks() / 10000.0f + 1));
     if (difficulty == 0){
         difficulty = 1;
     }
@@ -249,7 +249,7 @@ int main ( int argc, char** argv )
                     asteroids[i].destrect.x = 320;
                     asteroids[i].x_offset = (rand() % 320);
                     asteroids[i].amplitude = (rand() % 320) + 1;
-                    asteroids[i].speed = (rand() % 4) + 5;
+                    asteroids[i].speed = (rand() % 4) + 3;
 		            asteroid_time = SDL_GetTicks();
 		            break;
                 }
@@ -263,7 +263,7 @@ int main ( int argc, char** argv )
             j = rand() % 4;
 	        if (enemies[j][i].visible == 0){
 	            enemies[j][i].visible = 1;
-	            enemies[j][i].speed = rand() % 7 + 1;
+	            enemies[j][i].speed = rand() % 3 + 1;
                 enemies[j][i].destrect.x = rand() % 640;
                 enemies[j][i].destrect.y = rand() % 400;
                 break;
@@ -294,8 +294,8 @@ int main ( int argc, char** argv )
 	/*** Collision detection ***/
 	/* checking if the player collided with one of the asteroids */
 	for (i = 0; i < 7; i++){
-	    if (collision(player.destrect.x, asteroids[i].destrect.x, player.destrect.y, asteroids[i].destrect.y,
-	            40, 40, 40, 49) && asteroids[i].visible == 1){
+	    if (collision(player.destrect.x + 15, asteroids[i].destrect.x + 5, player.destrect.y + 15, asteroids[i].destrect.y + 5,
+	            20, 35, 20, 44) && asteroids[i].visible == 1){
 	        player.visible = 0;
 	    }
 	}
@@ -303,8 +303,8 @@ int main ( int argc, char** argv )
 	/* check collisions for all enemies. */
 	for (j = 0; j < 4; j++){
 	    for (i = 0; i < 10; i++){
-	        if (collision(player.destrect.x, enemies[j][i].destrect.x, player.destrect.y, enemies[j][i].destrect.y,
-	                40, 40, 40, 40) == 1 && enemies[j][i].visible == 1){
+	        if (collision(player.destrect.x + 15, enemies[j][i].destrect.x, player.destrect.y + 15, enemies[j][i].destrect.y,
+	                20, 40, 20, 40) == 1 && enemies[j][i].visible == 1){
 	            player.visible = 0;
                 }
 	    }
@@ -382,7 +382,14 @@ int main ( int argc, char** argv )
 
 int collision(int ax, int bx, int ay, int by, int a_size_x, int b_size_x, int a_size_y, int b_size_y)
 {
-    /* check upper left corner. */
+    if (ax > bx + b_size_x || ax + a_size_x < bx || ay > by + b_size_y || ay + a_size_y < by){
+        return 0;
+    }
+    else{
+        return 1;
+    }
+}
+    /* check upper left corner. 
     if (ax >= bx && ax <= bx + b_size_x
             && ay > by && ay <= by + b_size_y){
 	return 1;
@@ -406,5 +413,6 @@ int collision(int ax, int bx, int ay, int by, int a_size_x, int b_size_x, int a_
     else{
         return 0;
     }
-}
+    */
+
 
