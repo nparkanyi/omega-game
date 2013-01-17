@@ -1,11 +1,12 @@
 /* Nick Parkanyi, ICS3U Summative Project:
- * "Omega" shooter game. */
+ * "Omega" shooter game.
+ * See LICENSE for license info. */
 
 /* the surface type, software or hardware. Could be defined during compilation
  * to be hardware instead of software (can be problematic on some systems, so it's
  * not the default) */
 #ifndef SDLSFTYPE
-#define SDLSFTYPE SDL_SWSURFACE|SDL_FULLSCREEN
+#define SDLSFTYPE SDL_SWSURFACE
 #endif
 #include <stdlib.h>
 #include <math.h>
@@ -48,8 +49,8 @@ int main(int argc, char ** argv)
             SDL_FreeSurface(screen);
             SDL_Quit();
             break;
-        } 
-    
+        }
+
         score = game_loop(screen);
         //show_score(screen, score);
     }
@@ -67,11 +68,11 @@ int show_menu(SDL_Surface * screen){
                 case SDL_QUIT:
                     return 1;
                     break;
-                case SDL_KEYDOWN:
+                case SDL_KEYUP:
                     if (event.key.keysym.sym == SDLK_ESCAPE){
                         return 1;
                     }
-                    else {
+                    else if (event.key.keysym.sym == SDLK_RETURN){
                         return 0;
                     }
                     break;
@@ -84,7 +85,7 @@ int show_menu(SDL_Surface * screen){
     }
 }
 
-    
+
 int game_loop(SDL_Surface * screen)
 {
     int i, j, k;
@@ -231,7 +232,7 @@ int game_loop(SDL_Surface * screen)
 					                    player.bullets[player.colour][i].direction_y = -10;
 				                        break;
 
-					                case 1: 
+					                case 1:
                                         player.bullets[player.colour][i].direction_x = 10;
 				                        player.bullets[player.colour][i].direction_y = 0;
 				                        break;
@@ -287,7 +288,7 @@ int game_loop(SDL_Surface * screen)
             SDL_Flip(screen);
 		    SDL_Delay(125);
 	    }
-	    SDL_Delay(500);
+	    SDL_Delay(2000);
 	    /* quit the game */
 	    running = 1;
 	}
