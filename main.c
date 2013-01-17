@@ -15,39 +15,16 @@
 
 /* a general function for determining collision given coordinates and the sizes of the bounding boxes. */
 int collision(int ax, int bx, int ay, int by, int a_size_x, int b_size_x, int a_size_y, int b_size_y);
+/* This is the main loop of gameplay, returns the player's score in seconds. */
+int game_loop(SDL_Surface * screen);
+/* returns 1 if player wants to quit (presses escape) */
+int show_menu(SDL_Surface * screen);
+void show_score(SDL_Surface * screen, int score);
 
-int main ( int argc, char** argv )
+int main(int argc, char ** argv)
 {
-    int i, j, k;
-    int running = 0;
-    int direction = 0;
-    int game_start = 0;
-    /* used for checking the time for the time-based rendering. */
-    int last_time = 0;
-    /* indicates time passed since an asteroid may have been drawn. */
-    int asteroid_time = 0;
-    int sprite_num = 0;
-    int explosion_time = 0;
-    int explosion_number = 0;
-    int difficulty = 10000; /* This is used for random number generation for the asteroids and enemies. */
-
-    SDL_Event event;
+    int score;
     SDL_Surface * screen;
-    /* buffer for double buffering */
-    SDL_Surface * drawbuff;
-    SDL_Surface * background;
-    SDL_Rect dstrect;
-
-    /* contains all the player attributes. */
-    player player;
-    /* up to 10 enemies of each colour on screen at once. */
-    enemy enemies[4][10];
-    asteroid asteroids[7];
-    /* contains the five frames of the explosion animation. */
-    SDL_Surface * explosion[5];
-
-    /* random number seed */
-    srand(time(NULL));
 
     /* start SDL's video functionality */
     if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 )
@@ -66,6 +43,81 @@ int main ( int argc, char** argv )
     /* hide the window's cursor, it looks awful in fullscreen. */
     SDL_ShowCursor(0);
 
+    while (1){
+        if (show_menu(screen) == 1){
+            SDL_FreeSurface(screen);
+            SDL_Quit();
+            break;
+        } 
+    
+        score = game_loop(screen);
+        //show_score(screen, score);
+    }
+}
+
+int show_menu(SDL_Surface * screen){
+    SDL_Surface * menu;
+    SDL_Event event;
+
+    menu = SDL_LoadBMP("img/menu.bmp");
+
+    while(1){
+        while (SDL_PollEvent(&event)){
+            switch(event.type){
+                case SDL_QUIT:
+                    return 1;
+                    break;
+                case SDL_KEYDOWN:
+                    if (event.key.keysym.sym == SDLK_ESCAPE){
+                        return 1;
+                    }
+                    else {
+                        return 0;
+                    }
+                    break;
+            }
+        }
+
+        /* draw menu graphic on screen */
+        SDL_BlitSurface(menu, NULL, screen, NULL);
+        SDL_Flip(screen);
+    }
+}
+
+    
+int game_loop(SDL_Surface * screen)
+{
+    int i, j, k;
+    int running = 0;
+    int direction = 0;
+    int game_start = 0;
+    /* used for checking the time for the time-based rendering. */
+    int last_time = 0;
+    /* indicates time passed since an asteroid may have been drawn. */
+    int asteroid_time = 0;
+    int sprite_num = 0;
+    int explosion_time = 0;
+    int explosion_number = 0;
+    int difficulty = 10000; /* This is used for random number generation for the asteroids and enemies. */
+
+    SDL_Event event;
+    /* buffer for double buffering */
+    SDL_Surface * drawbuff;
+    SDL_Surface * background;
+    SDL_Rect dstrect;
+
+    /* contains all the player attributes. */
+    player player;
+    /* up to 10 enemies of each colour on screen at once. */
+    enemy enemies[4][10];
+    asteroid asteroids[7];
+    /* contains the five frames of the explosion animation. */
+    SDL_Surface * explosion[5];
+
+    /* random number seed */
+    srand(time(NULL));
+
+    /* initialize the player object. */
     player = load_player(screen);
 
     /* load the enemies of each colour. */
@@ -166,42 +218,42 @@ int main ( int argc, char** argv )
                                 player.colour++;
                             }
                             break;
-			case SDLK_SPACE:
-			    /* player fires bullet. */
-			    for (i = 0; i < 10; i++){
-			        if (player.bullets[player.colour][i].visible == 0){
-				    player.bullets[player.colour][i].visible = 1;
+			            case SDLK_SPACE:
+			            /* player fires bullet. */
+			            for (i = 0; i < 10; i++){
+			                if (player.bullets[player.colour][i].visible == 0){
+				                player.bullets[player.colour][i].visible = 1;
 
-				    player.bullets[player.colour][i].destrect.x = player.destrect.x + 20;
-				    player.bullets[player.colour][i].destrect.y = player.destrect.y + 20;
+				                player.bullets[player.colour][i].destrect.x = player.destrect.x + 20;
+				                player.bullets[player.colour][i].destrect.y = player.destrect.y + 20;
 
-				    switch(player.orientation){
-					case 0:
-				        player.bullets[player.colour][i].direction_x = 0;
-					player.bullets[player.colour][i].direction_y = -10;
-				        break;
+				                switch(player.orientation){
+					                case 0:
+				                        player.bullets[player.colour][i].direction_x = 0;
+					                    player.bullets[player.colour][i].direction_y = -10;
+				                        break;
 
-					case 1:
-					player.bullets[player.colour][i].direction_x = 10;
-				        player.bullets[player.colour][i].direction_y = 0;
-				        break;
+					                case 1: 
+                                        player.bullets[player.colour][i].direction_x = 10;
+				                        player.bullets[player.colour][i].direction_y = 0;
+				                        break;
 
-				        case 2:
-				        player.bullets[player.colour][i].direction_x = 0;
-				        player.bullets[player.colour][i].direction_y = 10;
-				        break;
+				                    case 2:
+				                        player.bullets[player.colour][i].direction_x = 0;
+				                        player.bullets[player.colour][i].direction_y = 10;
+				                        break;
 
-				        case 3:
-				        player.bullets[player.colour][i].direction_x = -10;
-				        player.bullets[player.colour][i].direction_y = 0;
-				        break;
-				    }
-				    break;
-				}
-			    }
+				                    case 3:
+				                        player.bullets[player.colour][i].direction_x = -10;
+				                        player.bullets[player.colour][i].direction_y = 0;
+				                        break;
+				                }
+				                break;
+				            }
+			            }
 
-                        }
-     	                break;
+                    }
+     	            break;
 
 		        case SDL_KEYUP:
                     switch (event.key.keysym.sym){
@@ -223,7 +275,7 @@ int main ( int argc, char** argv )
 
         }
 
-	difficulty = (int)(10000 / ((float)SDL_GetTicks() / 1000.0f + 1));
+	difficulty = (int)(10000 / ((float)SDL_GetTicks() / 10000.0f + 1));
     if (difficulty == 0){
         difficulty = 1;
     }
@@ -246,7 +298,7 @@ int main ( int argc, char** argv )
 	/* this will occasionally make a new asteroid fly across the screen with random attributes.*/
 	if (i < 10 && SDL_GetTicks() - asteroid_time > 100){
             for (i = 0; i < 7; i++){
-	            if (asteroids[i].visible == 0 && i < 2){
+	            if (asteroids[i].visible == 0){
 		            asteroids[i].visible = 1;
                     asteroids[i].destrect.x = 320;
                     asteroids[i].x_offset = (rand() % 320);
@@ -377,10 +429,8 @@ int main ( int argc, char** argv )
 
     SDL_FreeSurface(drawbuff);
     SDL_FreeSurface(background);
-    SDL_FreeSurface(screen);
-    SDL_Quit();
 
-    return (0);
+    return ((int) ((SDL_GetTicks() - game_start) / 1000.0f));
 }
 
 
