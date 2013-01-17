@@ -98,13 +98,14 @@ int game_loop(SDL_Surface * screen)
     int sprite_num = 0;
     int explosion_time = 0;
     int explosion_number = 0;
+    int bullet_number = 0;
+    int bullet_time = 0;
     int difficulty = 10000; /* This is used for random number generation for the asteroids and enemies. */
 
     SDL_Event event;
     /* buffer for double buffering */
     SDL_Surface * drawbuff;
     SDL_Surface * background;
-    SDL_Rect dstrect;
 
     /* contains all the player attributes. */
     player player;
@@ -153,9 +154,6 @@ int game_loop(SDL_Surface * screen)
 
     drawbuff = SDL_CreateRGBSurface(SDLSFTYPE, 640, 480, 32, 0, 0, 0, 0);
 
-    dstrect.x = 20;
-    dstrect.y = 20;
-
     game_start = SDL_GetTicks();
 
 /* ********* Main Game Loop **********/
@@ -177,8 +175,8 @@ int game_loop(SDL_Surface * screen)
                         case SDLK_ESCAPE:
                             running = 1;
                             break;
-			/* these will start the player moving in the proper direction when the
-			 * associated key is pressed. */
+			            /* these will start the player moving in the proper direction when the
+			             * associated key is pressed. */
                         case SDLK_DOWN:
                             player.direction[2] = 1;
                             break;
@@ -275,12 +273,12 @@ int game_loop(SDL_Surface * screen)
 
         }
 
-	difficulty = (int)(10000 / ((float)SDL_GetTicks() / 10000.0f + 1));
+	difficulty = (int)(10000 / ((float)(SDL_GetTicks() - game_start) / 10000.0f + 1));
     if (difficulty == 0){
         difficulty = 1;
     }
 
-	//printf("DIFFICULT: %d \n", difficulty);
+	printf("DIFFICULT: %d \n", difficulty);
 
 	/* play the player death animation if the player has been set as invisible. */
 	if (player.visible == 0){
@@ -296,17 +294,17 @@ int game_loop(SDL_Surface * screen)
 
     i = rand() % difficulty;
 	/* this will occasionally make a new asteroid fly across the screen with random attributes.*/
-	if (i < 10 && SDL_GetTicks() - asteroid_time > 100){
-            for (i = 0; i < 7; i++){
-	            if (asteroids[i].visible == 0){
-		            asteroids[i].visible = 1;
-                    asteroids[i].destrect.x = 320;
-                    asteroids[i].x_offset = (rand() % 320);
-                    asteroids[i].amplitude = (rand() % 320) + 1;
-                    asteroids[i].speed = (rand() % 5) + 3;
-		            asteroid_time = SDL_GetTicks();
-		            break;
-                }
+	if (i < 10 && SDL_GetTicks() - asteroid_time > 1000){
+        for (i = 0; i < 7; i++){
+	        if (asteroids[i].visible == 0){
+	            asteroids[i].visible = 1;
+                asteroids[i].destrect.x = 320;
+                asteroids[i].x_offset = (rand() % 320);
+                asteroids[i].amplitude = (rand() % 320) + 1;
+                asteroids[i].speed = (rand() % 5) + 3;
+	            asteroid_time = SDL_GetTicks();
+	            break;
+            }
 	    }
 	}
 
@@ -436,6 +434,7 @@ int game_loop(SDL_Surface * screen)
 
 int collision(int ax, int bx, int ay, int by, int a_size_x, int b_size_x, int a_size_y, int b_size_y)
 {
+    /* checks if object a is not colliding with object b. */
     if (ax > bx + b_size_x || ax + a_size_x < bx || ay > by + b_size_y || ay + a_size_y < by){
         return 0;
     }

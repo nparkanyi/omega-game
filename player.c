@@ -46,6 +46,7 @@ player load_player(SDL_Surface * format_surface)
     ship.destrect.h = 50;
 
     ship.visible = 1;
+    ship.time = 0;
 
     return ship;
 }
@@ -199,13 +200,24 @@ void draw_asteroid(asteroid * asteroid, SDL_Surface * destbuff)
 void draw_bullet(player * ship, SDL_Surface * destbuff)
 {
     int i, j;
+    static int bullet_num = 0;
+
+    if (SDL_GetTicks() - ship->time > 100){
+        if (bullet_num != 3){
+            bullet_num++;
+        }
+        else{
+            bullet_num = 0;
+        }
+        ship->time = SDL_GetTicks();
+    }
 
     for (j = 0; j < 4; j++){
         for (i = 0; i < 10; i++){
-	    if (ship->bullets[j][i].visible == 1){
-    	        SDL_BlitSurface(ship->bullets[j][i].animation[0], NULL, destbuff, &ship->bullets[j][i].destrect);
+	        if (ship->bullets[j][i].visible == 1){
+    	        SDL_BlitSurface(ship->bullets[j][i].animation[bullet_num], NULL, destbuff, &ship->bullets[j][i].destrect);
+	        }
 	    }
-	}
     }
 }
 

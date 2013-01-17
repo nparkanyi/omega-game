@@ -21,7 +21,7 @@ typedef struct {
     /* 0 to 3 */
     int orientation;
     int colour;  
-    /* only used for the enemy bullet timing */
+    /* only used for the bullet timing */
     int time;
     /* only for enemies, frequency of gunfire */
     int frequency;
