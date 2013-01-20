@@ -59,14 +59,13 @@ enemy load_enemy(const char * prefix, const char * bullet_prefix, SDL_Surface * 
     for (i = 0; i < 4; i++){
         enemy.direction[i] = 0;
     }
-    enemy.orientation = 0;
     enemy.visible = 0;
 
-    load_sprite(&enemy.sprites[0][0], 1, prefix, ".bmp", format_surface);
+    load_sprite(&enemy.sprite, 1, prefix, ".bmp", format_surface);
 
     for (i = 0; i < 10; i++){
-        load_sprite(&enemy.bullets[0][i].animation[0], 4, bullet_prefix, ".bmp", format_surface);
-	    enemy.bullets[0][i].visible = 0;
+        load_sprite(&enemy.bullets[i].animation[0], 4, bullet_prefix, ".bmp", format_surface);
+	    enemy.bullets[i].visible = 0;
     }
 
     return enemy;
@@ -154,7 +153,7 @@ void move_asteroid(asteroid * asteroid, int time)
 
     if (asteroid->destrect.y >= 480){
         asteroid->visible = 0;
-	asteroid->destrect.y = 0;
+	    asteroid->destrect.y = 0;
     }
 }
 
@@ -164,17 +163,34 @@ void move_bullets(player * ship, int time)
 
     for (j = 0; j < 4; j++){
         for (i = 0; i < 10; i++){
-	    if (ship->bullets[j][i].visible == 1){
-	        ship->bullets[j][i].destrect.x += ship->bullets[j][i].direction_x * time / 30.0f;
-		ship->bullets[j][i].destrect.y += ship->bullets[j][i].direction_y * time / 30.0f;
+	        if (ship->bullets[j][i].visible == 1){
+	            ship->bullets[j][i].destrect.x += ship->bullets[j][i].direction_x * time / 30.0f;
+		        ship->bullets[j][i].destrect.y += ship->bullets[j][i].direction_y * time / 30.0f;
 
-		if (ship->bullets[j][i].destrect.x >= 640 || ship->bullets[j][i].destrect.x <= 1
-		        || ship->bullets[j][i].destrect.y >= 480 || ship->bullets[j][i].destrect.y <= 1){
-		    ship->bullets[j][i].visible = 0;
-		}
+		        if (ship->bullets[j][i].destrect.x >= 640 || ship->bullets[j][i].destrect.x <= 1
+		                || ship->bullets[j][i].destrect.y >= 480 || ship->bullets[j][i].destrect.y <= 1){
+		            ship->bullets[j][i].visible = 0;
+		        }
+	        }
+	    }
+    }
+}
+
+void move_bullets_enemy(enemy * enemy, int time)
+{
+    int i, j;
+
+    for (i = 0; i < 10; i++){
+	    if (enemy->bullets[i].visible == 1){
+	        enemy->bullets[i].destrect.x += enemy->bullets[i].direction_x * time / 30.0f;
+	        enemy->bullets[i].destrect.y += enemy->bullets[i].direction_y * time / 30.0f;
+
+	        if (enemy->bullets[i].destrect.x >= 640 || enemy->bullets[i].destrect.x <= 1
+                    || enemy->bullets[i].destrect.y >= 480 || enemy->bullets[i].destrect.y <= 1){
+		        enemy->bullets[i].visible = 0;
+		    }
 	    }
 	}
-    }
 }
 
 void draw_player(player * ship, SDL_Surface * destbuff)
@@ -186,8 +202,9 @@ void draw_player(player * ship, SDL_Surface * destbuff)
 
 void draw_enemy(enemy * enemy, SDL_Surface * destbuff)
 {
-    enemy->orientation = 0;
-    draw_player(enemy, destbuff);
+    if (enemy->visible){
+       SDL_BlitSurface(enemy->sprite, NULL, destbuff, &enemy->destrect);
+    }
 }
 
 void draw_asteroid(asteroid * asteroid, SDL_Surface * destbuff)
@@ -217,6 +234,28 @@ void draw_bullet(player * ship, SDL_Surface * destbuff)
 	        if (ship->bullets[j][i].visible == 1){
     	        SDL_BlitSurface(ship->bullets[j][i].animation[bullet_num], NULL, destbuff, &ship->bullets[j][i].destrect);
 	        }
+	    }
+    }
+}
+
+void draw_bullet_enemy(enemy * enemy, SDL_Surface * destbuff)
+{
+    int i, j;
+    static int bullet_num = 0;
+
+    if (SDL_GetTicks() - enemy->time > 100){
+        if (bullet_num != 3){
+            bullet_num++;
+        }
+        else{
+            bullet_num = 0;
+        }
+        enemy->time = SDL_GetTicks();
+    }
+
+    for (i = 0; i < 10; i++){
+        if (enemy->bullets[i].visible == 1){
+    	    SDL_BlitSurface(enemy->bullets[i].animation[bullet_num], NULL, destbuff, &enemy->bullets[i].destrect);
 	    }
     }
 }
@@ -265,10 +304,10 @@ void load_sprite(SDL_Surface ** sprites, int num_sprites,
     for (i = 0; i < num_sprites; i++){
         filename[strlen(prefix)] = '1' + i;
         *(sprites + i)  = SDL_LoadBMP(filename);
-	if (*(sprites + i) == NULL){
-	    printf("Failed to load sprite.\n");
-	}
-	/*set white as the transparent colour. */
-	SDL_SetColorKey(*(sprites + i), SDL_SRCCOLORKEY, SDL_MapRGB(format_surface->format, 255, 255, 255));
+	    if (*(sprites + i) == NULL){
+	        printf("Failed to load sprite.\n");
+	    }
+	    /*set white as the transparent colour. */
+	    SDL_SetColorKey(*(sprites + i), SDL_SRCCOLORKEY, SDL_MapRGB(format_surface->format, 255, 255, 255));
     }
 }

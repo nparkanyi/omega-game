@@ -21,14 +21,9 @@ typedef struct {
     /* 0 to 3 */
     int orientation;
     int colour;  
-    /* only used for the bullet timing */
+    /* used for bullet timing. */
     int time;
-    /* only for enemies, frequency of gunfire */
-    int frequency;
-    /* only enemies, speed of movement */
-    int speed;
     /* if 0, player not on screen*/
-    /* if 3 in enemy, plays explosion animation. */
     int visible;
     /* 4 directions for each of the ship's four colours */
     SDL_Surface * sprites[4][4];
@@ -41,7 +36,22 @@ typedef struct {
 
 /* The same data structure for the player will be used for the
  * enemies. */
-typedef player enemy;
+typedef struct {
+    /* directions currently travelled in */
+    int direction[4];
+    int colour;
+    /* bullet timing */
+    int time;
+    /* frequency of gunfire */
+    int frequency;
+    /* speed of the enemy's movement */
+    int speed;
+    /* 3 indicates the enemy is in the process of being blown up. */
+    int visible;
+    SDL_Surface * sprite;
+    SDL_Rect destrect;
+    bullet bullets[10];
+}enemy;
 
 typedef struct{
     SDL_Surface * sprite;
@@ -65,6 +75,7 @@ void move_player(player * ship, int time);
 void move_enemy(enemy * enemy, int player_x, int player_y, int time);
 void move_asteroid(asteroid * asteroid, int time);
 void move_bullets(player * ship, int time);
+void move_bullets_enemy(enemy * enemy, int time);
 
 void draw_player(player * ship, SDL_Surface * destbuff);
 void draw_asteroid(asteroid * asteroid, SDL_Surface * destbuff);

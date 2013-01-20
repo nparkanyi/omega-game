@@ -160,7 +160,7 @@ int game_loop(SDL_Surface * screen)
 /* ********* Main Game Loop **********/
     while (running == 0){
 
-	/* loop to ensure we handle all events. */
+	    /* loop to ensure we handle all events. */
         while (SDL_PollEvent(&event))
         {
             switch (event.type)
@@ -328,16 +328,17 @@ int game_loop(SDL_Surface * screen)
 	/* randomnly have enemies shoot at player. */
 	i = rand() % difficulty;
 	if (i < 10 && SDL_GetTicks() - asteroid_time > 250){
-        i = rand() % 10;
+        i = rand() % 9;
+        k = rand() % 3;
         for(j = 0; j < 10; j++){
-            if (enemies[i].bullets[enemies[i].colour][j].visible != 1){
-                enemies[i].bullets[enemies[i].colour][j].direction_x =
-                        abs(player.destrect.x - enemies[i].bullets[enemies[i].colour][j].destrect.x) / 10;
-                enemies[i].bullets[enemies[i].colour][j].direction_y =
-                        abs(player.destrect.y - enemies[i].bullets[enemies[i].colour][j].destrect.y) / 10;
-                enemies[i].bullets[enemies[i].colour][j].destrect.x = enemies[i].destrect.x;
-                enemies[i].bullets[enemies[i].colour][j].destrect.y = enemies[i].destrect.x;
-                enemies[i].bullets[enemies[i].colour][j].visible = 1;
+            if (enemies[k][i].bullets[j].visible != 1 && enemies[k][i].visible == 1){
+                enemies[k][i].bullets[j].direction_x =
+                        abs(player.destrect.x - enemies[k][i].bullets[j].destrect.x) / 10;
+                enemies[k][i].bullets[j].direction_y =
+                        abs(player.destrect.y - enemies[k][j].bullets[j].destrect.y) / 10;
+                enemies[k][i].bullets[j].destrect.x = enemies[k][i].destrect.x;
+                enemies[k][i].bullets[j].destrect.y = enemies[k][i].destrect.x;
+                enemies[k][i].bullets[j].visible = 1;
                 break;
             }
         }
@@ -347,21 +348,23 @@ int game_loop(SDL_Surface * screen)
 	/* code to move the game's actors around appropriately */
     move_player(&player, SDL_GetTicks() - last_time);
 	move_bullets(&player, SDL_GetTicks() - last_time);
-	for (i = 0; i < 10; i++){
-	    move_bullets(&enemies[i], SDL_GetTicks() - last_time);
+    for (j = 0; j < 4; j++){
+	    for (i = 0; i < 10; i++){
+	        move_bullets_enemy(&(enemies[j][i]), SDL_GetTicks() - last_time);
+        }
     }
 
 	for (j = 0; j < 4; j++){
-            for (i = 0; i < 10; i++){
-                move_enemy(&enemies[j][i], player.destrect.x, player.destrect.y, SDL_GetTicks() - last_time);
-            }
+        for (i = 0; i < 10; i++){
+            move_enemy(&(enemies[j][i]), player.destrect.x, player.destrect.y, SDL_GetTicks() - last_time);
         }
+    }
 
 	for (i = 0; i < 7; i++){
             move_asteroid(&asteroids[i], SDL_GetTicks() - last_time);
 	}
 
-        last_time = SDL_GetTicks();
+    last_time = SDL_GetTicks();
 
 
 	/*** Collision detection ***/
@@ -384,13 +387,13 @@ int game_loop(SDL_Surface * screen)
 	}
 
 	for (i = 0; i < 10; i++){
-            for ( j = 0; j < 4; j++){
-                if (collision(player.bullets[j][i].destrect.x, enemies[j][i].destrect.x, player.bullets[j][i].destrect.y,
-	                    enemies[j][i].destrect.y, 10, 35, 10, 35) == 1 && player.bullets[j][i].visible == 1 && enemies[j][i].visible == 1){
-	                enemies[j][i].visible = 3;
-			        player.bullets[j][i].visible = 0;
-	            }
+        for ( j = 0; j < 4; j++){
+            if (collision(player.bullets[j][i].destrect.x, enemies[j][i].destrect.x, player.bullets[j][i].destrect.y,
+	                enemies[j][i].destrect.y, 10, 35, 10, 35) == 1 && player.bullets[j][i].visible == 1 && enemies[j][i].visible == 1){
+	            enemies[j][i].visible = 3;
+	         player.bullets[j][i].visible = 0;
 	        }
+	    }
 	}
 
     /*** Drawing Routines ***/
@@ -398,8 +401,10 @@ int game_loop(SDL_Surface * screen)
     SDL_BlitSurface(background, NULL, drawbuff, NULL);
     draw_player(&player, drawbuff);
     draw_bullet(&player, drawbuff);
-    for (i = 0; i < 10; i++){
-	    draw_bullet(&enemies[i], drawbuff);
+    for (j = 0; j < 4; j++){
+        for (i = 0; i < 10; i++){
+	        draw_bullet_enemy(&enemies[j][i], drawbuff);
+        }
     }
 
     for (j = 0; j < 4; j++){
@@ -431,9 +436,9 @@ int game_loop(SDL_Surface * screen)
         draw_asteroid(&asteroids[i], drawbuff);
 	}
 
-        /* update the screen, using double buffering. */
-        SDL_BlitSurface(drawbuff, NULL, screen, NULL);
-        SDL_Flip(screen);
+    /* update the screen, using double buffering. */
+    SDL_BlitSurface(drawbuff, NULL, screen, NULL);
+    SDL_Flip(screen);
 
     }
 
@@ -452,6 +457,8 @@ int game_loop(SDL_Surface * screen)
     SDL_FreeSurface(drawbuff);
     SDL_FreeSurface(background);
 
+    SDL_Delay(500);
+    /* return the player's score, seconds since start of game. */
     return ((int) ((SDL_GetTicks() - game_start) / 1000.0f));
 }
 

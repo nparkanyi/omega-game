@@ -1,2 +1,2 @@
 omega : main.c player.c player.h
-	$(CC) main.c player.c $(CFLAGS) -o omega -lSDL
+	$(CC) main.c player.c $(CFLAGS) -o omega -lSDL -lm
