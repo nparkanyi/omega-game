@@ -325,11 +325,31 @@ int game_loop(SDL_Surface * screen)
 	    asteroid_time = SDL_GetTicks();
 	}
 
+	/* randomnly have enemies shoot at player. */
+	i = rand() % difficulty;
+	if (i < 10 && SDL_GetTicks() - asteroid_time > 250){
+        i = rand() % 10;
+        for(j = 0; j < 10; j++){
+            if (enemies[i].bullets[enemies[i].colour][j].visible != 1){
+                enemies[i].bullets[enemies[i].colour][j].direction_x =
+                        abs(player.destrect.x - enemies[i].bullets[enemies[i].colour][j].destrect.x) / 10;
+                enemies[i].bullets[enemies[i].colour][j].direction_y =
+                        abs(player.destrect.y - enemies[i].bullets[enemies[i].colour][j].destrect.y) / 10;
+                enemies[i].bullets[enemies[i].colour][j].destrect.x = enemies[i].destrect.x;
+                enemies[i].bullets[enemies[i].colour][j].destrect.y = enemies[i].destrect.x;
+                enemies[i].bullets[enemies[i].colour][j].visible = 1;
+                break;
+            }
+        }
+	}
 
 
 	/* code to move the game's actors around appropriately */
     move_player(&player, SDL_GetTicks() - last_time);
 	move_bullets(&player, SDL_GetTicks() - last_time);
+	for (i = 0; i < 10; i++){
+	    move_bullets(&enemies[i], SDL_GetTicks() - last_time);
+    }
 
 	for (j = 0; j < 4; j++){
             for (i = 0; i < 10; i++){
@@ -378,6 +398,9 @@ int game_loop(SDL_Surface * screen)
     SDL_BlitSurface(background, NULL, drawbuff, NULL);
     draw_player(&player, drawbuff);
     draw_bullet(&player, drawbuff);
+    for (i = 0; i < 10; i++){
+	    draw_bullet(&enemies[i], drawbuff);
+    }
 
     for (j = 0; j < 4; j++){
         for (i = 0; i < 10; i++){
