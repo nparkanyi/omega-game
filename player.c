@@ -118,7 +118,7 @@ void move_enemy(enemy * enemy, int player_x, int player_y, int time)
     int y_move;
 
     if (enemy->visible == 1){
-        increment = (int)(time / 7.0f * enemy->speed);
+        increment = (int)(time / 30.0f * enemy->speed);
 
 	y_move = (int)((player_y - enemy->destrect.y) / 50.0f);
 	x_move = (int)((player_x - enemy->destrect.x) /50.0f);
