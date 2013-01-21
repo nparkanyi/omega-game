@@ -244,7 +244,7 @@ void draw_bullet_enemy(enemy * enemy, SDL_Surface * destbuff)
     int i, j;
     static int bullet_num = 0;
 
-    if (SDL_GetTicks() - enemy->time > 100){
+    if (SDL_GetTicks() - enemy->time > 500){
         if (bullet_num != 3){
             bullet_num++;
         }

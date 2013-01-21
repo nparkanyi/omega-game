@@ -6,12 +6,13 @@
  * to be hardware instead of software (can be problematic on some systems, so it's
  * not the default) */
 #ifndef SDLSFTYPE
-#define SDLSFTYPE SDL_SWSURFACE
+#define SDLSFTYPE SDL_SWSURFACE|SDL_FULLSCREEN
 #endif
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
 #include <SDL/SDL.h>
+#include <SDL/SDL_mixer.h>
 #include "player.h"
 
 /* a general function for determining collision given coordinates and the sizes of the bounding boxes. */
@@ -99,6 +100,13 @@ void show_score(SDL_Surface * screen, int score)
     SDL_Surface * score_background;
     SDL_Surface * numbers[10];
     SDL_Rect number_dest;
+    Mix_Music * music = NULL;
+
+    /* set up music */
+    Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 4096);
+    music = Mix_LoadMUS("score.wav");
+    /* loop music ad infinitum */
+    Mix_PlayMusic(music, -1);
 
     SDL_EventState(SDL_KEYDOWN, SDL_IGNORE);
     /* check the highscore file. */
@@ -169,6 +177,9 @@ void show_score(SDL_Surface * screen, int score)
     for (i = 0; i < 10; i++){
         SDL_FreeSurface(numbers[i]);
     }
+
+    Mix_FreeMusic(music);
+    Mix_CloseAudio();
 }
 
 
@@ -194,6 +205,8 @@ int game_loop(SDL_Surface * screen)
     SDL_Surface * drawbuff;
     SDL_Surface * background;
 
+    Mix_Music * music;
+
     /* contains all the player attributes. */
     player player;
     /* up to 10 enemies of each colour on screen at once. */
@@ -201,6 +214,10 @@ int game_loop(SDL_Surface * screen)
     asteroid asteroids[7];
     /* contains the five frames of the explosion animation. */
     SDL_Surface * explosion[5];
+
+    /* load game music, initalize audio */
+    Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 4096);
+    music = Mix_LoadMUS("game.wav");
 
     /* random number seed */
     srand(time(NULL));
@@ -531,6 +548,7 @@ int game_loop(SDL_Surface * screen)
     draw_bullet(&player, drawbuff);
     for (j = 0; j < 4; j++){
         for (i = 0; i < 10; i++){
+            /* draw the enemies' bullets */
 	        draw_bullet_enemy(&enemies[j][i], drawbuff);
         }
     }
@@ -538,6 +556,7 @@ int game_loop(SDL_Surface * screen)
     for (j = 0; j < 4; j++){
         for (i = 0; i < 10; i++){
 
+            /* animate the enemies' explosions when appropriate */
 	        if (enemies[j][i].visible == 3){
 	            if ( SDL_GetTicks() - explosion_time > 50){
 		            if ( explosion_number < 3){
@@ -570,9 +589,6 @@ int game_loop(SDL_Surface * screen)
 
     }
 
-    printf("\nYour score is: %d seconds. \n", (int)((SDL_GetTicks() - game_start) / 1000.0f));
-
-
     delete_player(&player);
     for (i = 0; i < 7; i++){
         delete_asteroid(&asteroids[i]);
@@ -590,6 +606,9 @@ int game_loop(SDL_Surface * screen)
 
     SDL_FreeSurface(drawbuff);
     SDL_FreeSurface(background);
+
+    Mix_FreeMusic(music);
+    Mix_CloseAudio();
 
     SDL_Delay(500);
     /* return the player's score, seconds since start of game. */
