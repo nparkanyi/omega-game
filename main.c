@@ -6,7 +6,7 @@
  * to be hardware instead of software (can be problematic on some systems, so it's
  * not the default) */
 #ifndef SDLSFTYPE
-#define SDLSFTYPE SDL_SWSURFACE
+#define SDLSFTYPE SDL_SWSURFACE|SDL_FULLSCREEN
 #endif
 #include <stdlib.h>
 #include <math.h>
@@ -60,7 +60,10 @@ int show_menu(SDL_Surface * screen){
     SDL_Surface * menu;
     SDL_Event event;
 
+    SDL_EventState(SDL_KEYDOWN, SDL_IGNORE);
     menu = SDL_LoadBMP("img/menu.bmp");
+    SDL_BlitSurface(menu, NULL, screen, NULL);
+    SDL_EventState(SDL_KEYDOWN, SDL_ENABLE);
 
     while(1){
         while (SDL_PollEvent(&event)){
@@ -80,7 +83,6 @@ int show_menu(SDL_Surface * screen){
         }
 
         /* draw menu graphic on screen */
-        SDL_BlitSurface(menu, NULL, screen, NULL);
         SDL_Flip(screen);
     }
 }
@@ -226,6 +228,7 @@ int game_loop(SDL_Surface * screen)
 				                player.bullets[player.colour][i].destrect.x = player.destrect.x + 20;
 				                player.bullets[player.colour][i].destrect.y = player.destrect.y + 20;
 
+                                /* send the bullet in the appropriate direction.  */
 				                switch(player.orientation){
 					                case 0:
 				                        player.bullets[player.colour][i].direction_x = 0;
@@ -254,6 +257,7 @@ int game_loop(SDL_Surface * screen)
                     }
      	            break;
 
+                /* key released, stop movement in the appropriate directions. */
 		        case SDL_KEYUP:
                     switch (event.key.keysym.sym){
                         case SDLK_DOWN:
@@ -274,12 +278,13 @@ int game_loop(SDL_Surface * screen)
 
         }
 
+    /* this sets our difficulty level based on time; lower is more difficult. */
 	difficulty = (int)(10000 / ((float)(SDL_GetTicks() - game_start) / 10000.0f + 1));
     if (difficulty == 0){
         difficulty = 1;
     }
 
-	printf("DIFFICULT: %d \n", difficulty);
+//	printf("DIFFICULT: %d \n", difficulty);
 
 	/* play the player death animation if the player has been set as invisible. */
 	if (player.visible == 0){
@@ -316,7 +321,7 @@ int game_loop(SDL_Surface * screen)
             j = rand() % 4;
 	        if (enemies[j][i].visible == 0){
 	            enemies[j][i].visible = 1;
-	            enemies[j][i].speed = rand() % 3 + 1;
+	            enemies[j][i].speed = rand() % 2 + 1;
                 enemies[j][i].destrect.x = rand() % 640;
                 enemies[j][i].destrect.y = rand() % 400;
                 break;
@@ -327,18 +332,42 @@ int game_loop(SDL_Surface * screen)
 
 	/* randomnly have enemies shoot at player. */
 	i = rand() % difficulty;
-	if (i < 10 && SDL_GetTicks() - asteroid_time > 250){
+	if (i < 1000 && SDL_GetTicks() - asteroid_time > 250){
         i = rand() % 9;
         k = rand() % 3;
         for(j = 0; j < 10; j++){
             if (enemies[k][i].bullets[j].visible != 1 && enemies[k][i].visible == 1){
-                enemies[k][i].bullets[j].direction_x =
-                        abs(player.destrect.x - enemies[k][i].bullets[j].destrect.x) / 10;
-                enemies[k][i].bullets[j].direction_y =
-                        abs(player.destrect.y - enemies[k][j].bullets[j].destrect.y) / 10;
+                /* determine the horizontal direction. */
+                if (player.destrect.x < enemies[k][i].destrect.x - 20){
+                    enemies[k][i].bullets[j].direction_x = -1;
+                }
+                else if (player.destrect.x > enemies[k][i].destrect.x + 20){
+                    enemies[k][i].bullets[j].direction_x = 1;
+                }
+                else{
+                    enemies[k][i].bullets[j].direction_x = 0;
+                    printf("ZERO\n");
+                }
+
+                /* determine the vertical direction. */
+                if (player.destrect.y < enemies[k][i].destrect.y - 20){
+                    enemies[k][i].bullets[j].direction_y = -1;
+                }
+                else if (player.destrect.y > enemies[k][i].destrect.y + 20){
+                    enemies[k][i].bullets[j].direction_y = 1;
+                }
+                else{
+                    enemies[k][i].bullets[j].direction_y = 0;
+                    printf("zero\n");
+                }
+
+                /* set initial starting position. */
                 enemies[k][i].bullets[j].destrect.x = enemies[k][i].destrect.x;
-                enemies[k][i].bullets[j].destrect.y = enemies[k][i].destrect.x;
-                enemies[k][i].bullets[j].visible = 1;
+                enemies[k][i].bullets[j].destrect.y = enemies[k][i].destrect.y;
+
+                if (enemies[k][i].bullets[j].destrect.y != 0 || enemies[k][i].bullets[j].destrect.x != 0){
+                    enemies[k][i].bullets[j].visible = 1;
+                }
                 break;
             }
         }
@@ -350,13 +379,13 @@ int game_loop(SDL_Surface * screen)
 	move_bullets(&player, SDL_GetTicks() - last_time);
     for (j = 0; j < 4; j++){
 	    for (i = 0; i < 10; i++){
-	        move_bullets_enemy(&(enemies[j][i]), SDL_GetTicks() - last_time);
+	        move_bullets_enemy(&enemies[j][i], SDL_GetTicks() - last_time);
         }
     }
 
 	for (j = 0; j < 4; j++){
         for (i = 0; i < 10; i++){
-            move_enemy(&(enemies[j][i]), player.destrect.x, player.destrect.y, SDL_GetTicks() - last_time);
+            move_enemy(&enemies[j][i], player.destrect.x, player.destrect.y, SDL_GetTicks() - last_time);
         }
     }
 
