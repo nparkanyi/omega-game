@@ -183,7 +183,7 @@ void move_bullets_enemy(enemy * enemy, int time)
     for (i = 0; i < 10; i++){
 	    if (enemy->bullets[i].visible == 1){
 	        enemy->bullets[i].destrect.x += enemy->bullets[i].direction_x * time / 10.0f;
-	        enemy->bullets[i].destrect.y += enemy->bullets[i].direction_y * time / 30.0f;
+	        enemy->bullets[i].destrect.y += enemy->bullets[i].direction_y * time / 10.0f;
             printf("%d\n", time);
 
 	        if (enemy->bullets[i].destrect.x >= 640 || enemy->bullets[i].destrect.x <= 1
@@ -289,6 +289,15 @@ void delete_player(player * ship)
         }
     }
 }
+
+void delete_enemy(enemy * enemy)
+{
+    int j;
+    SDL_FreeSurface(enemy->sprite);
+    for (j = 0; j < 10; j++){
+        delete_bullet(&(enemy->bullets[j]));
+    }
+}
 /* general function for loading series of numbered bitmaps into
  * sprites. */
 void load_sprite(SDL_Surface ** sprites, int num_sprites,
@@ -304,11 +313,13 @@ void load_sprite(SDL_Surface ** sprites, int num_sprites,
 
     for (i = 0; i < num_sprites; i++){
         filename[strlen(prefix)] = '1' + i;
+        printf ("\n%s\n", filename);
         *(sprites + i)  = SDL_LoadBMP(filename);
 	    if (*(sprites + i) == NULL){
-	        printf("Failed to load sprite.\n");
+	        printf("Failed to load sprite: %d.\n", i);
 	    }
 	    /*set white as the transparent colour. */
 	    SDL_SetColorKey(*(sprites + i), SDL_SRCCOLORKEY, SDL_MapRGB(format_surface->format, 255, 255, 255));
     }
+    printf("Done!\n");
 }

@@ -6,7 +6,7 @@
  * to be hardware instead of software (can be problematic on some systems, so it's
  * not the default) */
 #ifndef SDLSFTYPE
-#define SDLSFTYPE SDL_SWSURFACE|SDL_FULLSCREEN
+#define SDLSFTYPE SDL_SWSURFACE
 #endif
 #include <stdlib.h>
 #include <math.h>
@@ -52,14 +52,16 @@ int main(int argc, char ** argv)
         }
 
         score = game_loop(screen);
-        //show_score(screen, score);
+        show_score(screen, score);
     }
+    SDL_FreeSurface(screen);
 }
 
 int show_menu(SDL_Surface * screen){
     SDL_Surface * menu;
     SDL_Event event;
 
+    SDL_Delay(500);
     SDL_EventState(SDL_KEYDOWN, SDL_IGNORE);
     menu = SDL_LoadBMP("img/menu.bmp");
     SDL_BlitSurface(menu, NULL, screen, NULL);
@@ -84,6 +86,88 @@ int show_menu(SDL_Surface * screen){
 
         /* draw menu graphic on screen */
         SDL_Flip(screen);
+    }
+
+    SDL_FreeSurface(menu);
+}
+
+void show_score(SDL_Surface * screen, int score)
+{
+    int i, j = 0;
+    int highscore;
+    FILE * fhighscore;
+    SDL_Surface * score_background;
+    SDL_Surface * numbers[10];
+    SDL_Rect number_dest;
+
+    SDL_EventState(SDL_KEYDOWN, SDL_IGNORE);
+    /* check the highscore file. */
+    fhighscore = fopen("highscore", "r");
+    if (fhighscore != NULL){
+        fscanf(fhighscore, "%d", &highscore);
+        if (score > highscore){
+            highscore = score;
+            fhighscore = fopen("highscore", "w");
+            fprintf(fhighscore, "%d", highscore);
+        }
+        fclose(fhighscore);
+    }
+    else{
+        highscore = score;
+        fhighscore = fopen("highscore", "w");
+        fprintf(fhighscore, "%d", highscore);
+        fclose(fhighscore);
+    }
+    printf("highscore: %d", highscore);
+
+    score_background = SDL_LoadBMP("img/score.bmp");
+    /* load the number sprites for printing the scores. */
+    numbers[0] = SDL_LoadBMP("img/num0.bmp");
+    SDL_SetColorKey(numbers[0], SDL_SRCCOLORKEY, SDL_MapRGB(screen->format, 255, 255, 255));
+
+    load_sprite(&numbers[1], 9, "img/num", ".bmp", screen);
+
+    SDL_BlitSurface(score_background, NULL, screen, NULL);
+    SDL_Flip(screen);
+
+
+    number_dest.x = 280;
+    number_dest.y = 110;
+
+    while (score >= 1){
+        /* retrieve the last decimal place's value */
+        i = score % 10;
+        SDL_BlitSurface(numbers[i], NULL, screen, &number_dest); 
+        SDL_Flip(screen);
+        /* make last decimal place zero, then divide by ten */
+        score = (score - i) / 10;
+        number_dest.x -= 22;
+    }
+
+    number_dest.x = 280;
+    number_dest.y = 250;
+
+    while (highscore >= 1){
+        i = highscore % 10;
+        SDL_BlitSurface(numbers[i], NULL, screen, &number_dest);
+        SDL_Flip(screen);
+        highscore = (highscore - i) / 10;
+        number_dest.x -= 22;
+    }
+
+    /* update the screen */
+    SDL_Flip(screen);
+
+    SDL_EventState(SDL_KEYDOWN, SDL_ENABLE);
+
+    SDL_Delay(500);
+    /* wait for user input*/
+    SDL_WaitEvent(NULL);
+
+    /* destroy the allocated surfaces. */
+    SDL_FreeSurface (score_background);
+    for (i = 0; i < 10; i++){
+        SDL_FreeSurface(numbers[i]);
     }
 }
 
@@ -139,7 +223,6 @@ int game_loop(SDL_Surface * screen)
     }
 
 
-
     /* initialize all the asteroids */
     for (i = 0; i < 7; i++){
         asteroids[i] = load_asteroid(screen);
@@ -159,7 +242,7 @@ int game_loop(SDL_Surface * screen)
 
     game_start = SDL_GetTicks();
 
-/* ********* Main Game Loop **********/
+    /* ********* Main Game Loop **********/
     while (running == 0){
 
 	    /* loop to ensure we handle all events. */
@@ -497,6 +580,12 @@ int game_loop(SDL_Surface * screen)
 
     for (i = 0; i < 5; i++){
         SDL_FreeSurface(explosion[i]);
+    }
+
+    for(i = 0; i < 10; i++){
+        for (j = 0; j < 4; j++){
+            delete_enemy(&enemies[j][i]);
+        }
     }
 
     SDL_FreeSurface(drawbuff);
