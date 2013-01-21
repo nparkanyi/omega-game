@@ -338,23 +338,25 @@ int game_loop(SDL_Surface * screen)
         for(j = 0; j < 10; j++){
             if (enemies[k][i].bullets[j].visible != 1 && enemies[k][i].visible == 1){
                 /* determine the horizontal direction. */
-                if (player.destrect.x < enemies[k][i].destrect.x){
-                    enemies[k][i].bullets[j].direction_x = -1;
+                if (player.destrect.x < enemies[k][i].destrect.x - 10){
+                    enemies[k][i].bullets[j].direction_x = -2;
                 }
-                else if (player.destrect.x > enemies[k][i].destrect.x){
-                    enemies[k][i].bullets[j].direction_x = 1;
+                else if (player.destrect.x > enemies[k][i].destrect.x + 10){
+                    enemies[k][i].bullets[j].direction_x = 2;
                 }
                 else{
                     enemies[k][i].bullets[j].direction_x = 0;
                     printf("ZERO\n");
                 }
+                //enemies[k][i].bullets[j].direction_x = -2;
+                //enemies[k][i].bullets[j].direction_y = 2;
 
                 /* determine the vertical direction. */
-                if (player.destrect.y < enemies[k][i].destrect.y){
-                    enemies[k][i].bullets[j].direction_y = -1;
+                if (player.destrect.y < enemies[k][i].destrect.y - 10){
+                    enemies[k][i].bullets[j].direction_y = -2;
                 }
-                else if (player.destrect.y > enemies[k][i].destrect.y){
-                    enemies[k][i].bullets[j].direction_y = 1;
+                else if (player.destrect.y > enemies[k][i].destrect.y + 10){
+                    enemies[k][i].bullets[j].direction_y = 2;
                 }
                 else{
                     enemies[k][i].bullets[j].direction_y = 0;
@@ -411,10 +413,11 @@ int game_loop(SDL_Surface * screen)
 	        if (collision(player.destrect.x + 15, enemies[j][i].destrect.x, player.destrect.y + 15, enemies[j][i].destrect.y,
 	                20, 40, 20, 40) == 1 && enemies[j][i].visible == 1){
 	            player.visible = 0;
-                }
+            } 
 	    }
 	}
 
+    /* check player's bullets with enemies */
 	for (i = 0; i < 10; i++){
         for ( j = 0; j < 4; j++){
             if (collision(player.bullets[j][i].destrect.x, enemies[j][i].destrect.x, player.bullets[j][i].destrect.y,
@@ -424,6 +427,19 @@ int game_loop(SDL_Surface * screen)
 	        }
 	    }
 	}
+
+    /* check enemies' bullets with player. */
+    for (i = 0; i < 10; i++){
+        for (j = 0; j < 4; j++){
+            for (k = 0; k < 10; k++){
+                if (enemies[j][i].bullets[k].visible && 
+                        collision(enemies[j][i].bullets[k].destrect.x, player.destrect.x +15, enemies[j][i].bullets[k].destrect.y, player.destrect.y + 15,
+                        10, 20, 10, 20)){
+                    player.visible = 0;
+                }
+            }
+        }
+    }
 
     /*** Drawing Routines ***/
 

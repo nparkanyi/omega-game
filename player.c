@@ -182,8 +182,9 @@ void move_bullets_enemy(enemy * enemy, int time)
 
     for (i = 0; i < 10; i++){
 	    if (enemy->bullets[i].visible == 1){
-	        enemy->bullets[i].destrect.x += enemy->bullets[i].direction_x * time / 30.0f;
+	        enemy->bullets[i].destrect.x += enemy->bullets[i].direction_x * time / 10.0f;
 	        enemy->bullets[i].destrect.y += enemy->bullets[i].direction_y * time / 30.0f;
+            printf("%d\n", time);
 
 	        if (enemy->bullets[i].destrect.x >= 640 || enemy->bullets[i].destrect.x <= 1
                     || enemy->bullets[i].destrect.y >= 480 || enemy->bullets[i].destrect.y <= 1){
