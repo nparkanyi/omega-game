@@ -1,0 +1,7 @@
+#!/bin/sh
+#This uses xrandr to manually set the user's screen resolution
+#to that of the game. This is done to fix issues with fullscreen
+#in certain window managers such as DWM. 
+xrandr -s 640x480
+./omega
+xrandr -s 0
