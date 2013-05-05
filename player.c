@@ -6,12 +6,14 @@
 #include <SDL/SDL.h>
 #include "player.h"
 
+/* NOTE better descriptions for these functions are available
+ * in player.h and the external documentation */
 player load_player(SDL_Surface * format_surface)
 {
     player ship;
     int i;
 
-    for (i = 0; i < 5; i++){
+    for (i = 0; i < 4; i++){
         ship.direction[i] = 0;
     }
 
@@ -23,6 +25,7 @@ player load_player(SDL_Surface * format_surface)
     load_sprite(&ship.sprites[2][0], 4, "img/shipblue", ".bmp", format_surface);
     load_sprite(&ship.sprites[3][0], 4, "img/shipblack", ".bmp", format_surface);
 
+    /* load all the bullet sprites */
     for (i = 0; i < 10; i++){
         load_sprite(&ship.bullets[0][i].animation[0], 4, "img/bulletyellow", ".bmp", format_surface);
 	ship.bullets[0][i].visible = 0;
@@ -63,6 +66,7 @@ enemy load_enemy(const char * prefix, const char * bullet_prefix, SDL_Surface * 
 
     load_sprite(&enemy.sprite, 1, prefix, ".bmp", format_surface);
 
+    /*load the numbered sprites */
     for (i = 0; i < 10; i++){
         load_sprite(&enemy.bullets[i].animation[0], 4, bullet_prefix, ".bmp", format_surface);
 	    enemy.bullets[i].visible = 0;
@@ -73,7 +77,6 @@ enemy load_enemy(const char * prefix, const char * bullet_prefix, SDL_Surface * 
 
 asteroid load_asteroid(SDL_Surface * sprite)
 {
-    int i;
     asteroid asteroid;
 
     asteroid.sprite = SDL_LoadBMP("img/asteroid.bmp");
@@ -141,12 +144,11 @@ void move_enemy(enemy * enemy, int player_x, int player_y, int time)
 void move_asteroid(asteroid * asteroid, int time)
 {
     int increment_y;
-    static int increment_x = 1;
     increment_y = time / 30.0f * asteroid->speed;
 
     if (asteroid->visible == 1){
         asteroid->destrect.y += increment_y;
-	/* move asteroid in a cosine curve. */
+	    /* move asteroid in a sine curve with a y increment for maximum dramatic effect . */
         asteroid->destrect.x = (int)(asteroid->amplitude *
 	        sin(0.01f * asteroid->speed * asteroid->destrect.y) + asteroid->amplitude + asteroid->x_offset);
     }
@@ -163,10 +165,12 @@ void move_bullets(player * ship, int time)
 
     for (j = 0; j < 4; j++){
         for (i = 0; i < 10; i++){
+	        /* move the position based on the increment value and time */
 	        if (ship->bullets[j][i].visible == 1){
 	            ship->bullets[j][i].destrect.x += ship->bullets[j][i].direction_x * time / 30.0f;
 		        ship->bullets[j][i].destrect.y += ship->bullets[j][i].direction_y * time / 30.0f;
 
+		        /* make invisible if out of screen bounds */
 		        if (ship->bullets[j][i].destrect.x >= 640 || ship->bullets[j][i].destrect.x <= 1
 		                || ship->bullets[j][i].destrect.y >= 480 || ship->bullets[j][i].destrect.y <= 1){
 		            ship->bullets[j][i].visible = 0;
@@ -181,11 +185,12 @@ void move_bullets_enemy(enemy * enemy, int time)
     int i;
 
     for (i = 0; i < 10; i++){
+	    /* see above, this is essentially the same */
 	    if (enemy->bullets[i].visible == 1){
 	        enemy->bullets[i].destrect.x += enemy->bullets[i].direction_x * time / 10.0f;
 	        enemy->bullets[i].destrect.y += enemy->bullets[i].direction_y * time / 10.0f;
-            printf("%d\n", time);
 
+            /* make invisible if out of screen bounds */
 	        if (enemy->bullets[i].destrect.x >= 640 || enemy->bullets[i].destrect.x <= 1
                     || enemy->bullets[i].destrect.y >= 480 || enemy->bullets[i].destrect.y <= 1){
 		        enemy->bullets[i].visible = 0;
@@ -220,6 +225,7 @@ void draw_bullet(player * ship, SDL_Surface * destbuff)
     int i, j;
     static int bullet_num = 0;
 
+    /* adjust the bullet frame */
     if (SDL_GetTicks() - ship->time > 100){
         if (bullet_num != 3){
             bullet_num++;
@@ -230,6 +236,7 @@ void draw_bullet(player * ship, SDL_Surface * destbuff)
         ship->time = SDL_GetTicks();
     }
 
+    /* blit the bullet sprites */
     for (j = 0; j < 4; j++){
         for (i = 0; i < 10; i++){
 	        if (ship->bullets[j][i].visible == 1){
@@ -241,10 +248,12 @@ void draw_bullet(player * ship, SDL_Surface * destbuff)
 
 void draw_bullet_enemy(enemy * enemy, SDL_Surface * destbuff)
 {
-    int i, j;
+    int i;
     static int bullet_num = 0;
 
+    /* only change frame after certain amount of time */
     if (SDL_GetTicks() - enemy->time > 500){
+        /* cycle bullet animation frame */
         if (bullet_num != 3){
             bullet_num++;
         }
@@ -261,6 +270,7 @@ void draw_bullet_enemy(enemy * enemy, SDL_Surface * destbuff)
     }
 }
 
+/* these functions clear the allocated memory for the appropriate objects. */
 void delete_bullet(bullet * bul)
 {
     int i;
@@ -306,14 +316,16 @@ void load_sprite(SDL_Surface ** sprites, int num_sprites,
     int i;
     char filename[60];
 
+    /* prepares the filename with the prefix and postfix,
+     * leaving space for the numbers. */
     strcpy(filename, prefix);
     filename[strlen(prefix)] = ' ';
     filename[strlen(prefix) + 1] = '\0';
     strcat(filename, postfix);
 
     for (i = 0; i < num_sprites; i++){
+        /* change the number in the filename */
         filename[strlen(prefix)] = '1' + i;
-        printf ("\n%s\n", filename);
         *(sprites + i)  = SDL_LoadBMP(filename);
 	    if (*(sprites + i) == NULL){
 	        printf("Failed to load sprite: %d.\n", i);
@@ -321,5 +333,4 @@ void load_sprite(SDL_Surface ** sprites, int num_sprites,
 	    /*set white as the transparent colour. */
 	    SDL_SetColorKey(*(sprites + i), SDL_SRCCOLORKEY, SDL_MapRGB(format_surface->format, 255, 255, 255));
     }
-    printf("Done!\n");
 }

@@ -6,6 +6,7 @@
  * to be hardware instead of software (can be problematic on some systems, so it's
  * not the default) */
 #ifndef SDLSFTYPE
+/* uncomment the end of the next line to enable fullscreen, WILL NOT WORK WITH NETSUPPORT */
 #define SDLSFTYPE SDL_SWSURFACE|SDL_FULLSCREEN
 #endif
 #include <stdlib.h>
@@ -46,6 +47,7 @@ int main(int argc, char ** argv)
     SDL_ShowCursor(0);
 
     while (1){
+	/* user has quit */    
         if (show_menu(screen) == 1){
             SDL_FreeSurface(screen);
             SDL_Quit();
@@ -55,7 +57,7 @@ int main(int argc, char ** argv)
         score = game_loop(screen);
         show_score(screen, score);
     }
-    SDL_FreeSurface(screen);
+    //SDL_FreeSurface(screen);
 }
 
 int show_menu(SDL_Surface * screen){
@@ -69,16 +71,20 @@ int show_menu(SDL_Surface * screen){
     SDL_EventState(SDL_KEYDOWN, SDL_ENABLE);
 
     while(1){
+        /* cycle through sdl events*/
         while (SDL_PollEvent(&event)){
             switch(event.type){
                 case SDL_QUIT:
+    		    SDL_FreeSurface(menu);
                     return 1;
                     break;
                 case SDL_KEYUP:
                     if (event.key.keysym.sym == SDLK_ESCAPE){
+    			SDL_FreeSurface(menu);
                         return 1;
                     }
                     else if (event.key.keysym.sym == SDLK_RETURN){
+    			SDL_FreeSurface(menu);
                         return 0;
                     }
                     break;
@@ -89,12 +95,11 @@ int show_menu(SDL_Surface * screen){
         SDL_Flip(screen);
     }
 
-    SDL_FreeSurface(menu);
 }
 
 void show_score(SDL_Surface * screen, int score)
 {
-    int i, j = 0;
+    int i = 0;
     int highscore;
     FILE * fhighscore;
     SDL_Surface * score_background;
@@ -104,7 +109,9 @@ void show_score(SDL_Surface * screen, int score)
 
     /* set up music */
     Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 4096);
-    music = Mix_LoadMUS("score.wav");
+    /* aww fuck yiss music is what */
+    music = Mix_LoadMUS("score.ogg");
+
     /* loop music ad infinitum */
     Mix_PlayMusic(music, -1);
 
@@ -126,7 +133,7 @@ void show_score(SDL_Surface * screen, int score)
         fprintf(fhighscore, "%d", highscore);
         fclose(fhighscore);
     }
-    printf("highscore: %d", highscore);
+
 
     score_background = SDL_LoadBMP("img/score.bmp");
     /* load the number sprites for printing the scores. */
@@ -145,7 +152,7 @@ void show_score(SDL_Surface * screen, int score)
     while (score >= 1){
         /* retrieve the last decimal place's value */
         i = score % 10;
-        SDL_BlitSurface(numbers[i], NULL, screen, &number_dest); 
+        SDL_BlitSurface(numbers[i], NULL, screen, &number_dest);
         SDL_Flip(screen);
         /* make last decimal place zero, then divide by ten */
         score = (score - i) / 10;
@@ -217,8 +224,9 @@ int game_loop(SDL_Surface * screen)
 
     /* load game music, initalize audio */
     Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 4096);
-    music = Mix_LoadMUS("game.wav");
-
+    music = Mix_LoadMUS("game.ogg");
+    /* loop the music infinitely */
+    Mix_PlayMusic(music, -1);
     /* random number seed */
     srand(time(NULL));
 
@@ -328,7 +336,8 @@ int game_loop(SDL_Surface * screen)
 				                player.bullets[player.colour][i].destrect.x = player.destrect.x + 20;
 				                player.bullets[player.colour][i].destrect.y = player.destrect.y + 20;
 
-                                /* send the bullet in the appropriate direction.  */
+                                /* send the bullet in the appropriate direction, depending on the player's
+                                 * orientation. */
 				                switch(player.orientation){
 					                case 0:
 				                        player.bullets[player.colour][i].direction_x = 0;
@@ -446,12 +455,9 @@ int game_loop(SDL_Surface * screen)
                 }
                 else{
                     enemies[k][i].bullets[j].direction_x = 0;
-                    printf("ZERO\n");
                 }
-                //enemies[k][i].bullets[j].direction_x = -2;
-                //enemies[k][i].bullets[j].direction_y = 2;
 
-                /* determine the vertical direction. */
+                /* determine the vertical direction based on the player's position */
                 if (player.destrect.y < enemies[k][i].destrect.y - 10){
                     enemies[k][i].bullets[j].direction_y = -2;
                 }
@@ -460,13 +466,14 @@ int game_loop(SDL_Surface * screen)
                 }
                 else{
                     enemies[k][i].bullets[j].direction_y = 0;
-                    printf("zero\n");
+
                 }
 
                 /* set initial starting position. */
                 enemies[k][i].bullets[j].destrect.x = enemies[k][i].destrect.x;
                 enemies[k][i].bullets[j].destrect.y = enemies[k][i].destrect.y;
 
+                /* ensure the bullets actually move at all */
                 if (enemies[k][i].bullets[j].destrect.y != 0 || enemies[k][i].bullets[j].destrect.x != 0){
                     enemies[k][i].bullets[j].visible = 1;
                 }
@@ -476,7 +483,7 @@ int game_loop(SDL_Surface * screen)
 	}
 
 
-	/* code to move the game's actors around appropriately */
+	/* code to move all the game's actors around appropriately */
     move_player(&player, SDL_GetTicks() - last_time);
 	move_bullets(&player, SDL_GetTicks() - last_time);
     for (j = 0; j < 4; j++){
@@ -513,7 +520,7 @@ int game_loop(SDL_Surface * screen)
 	        if (collision(player.destrect.x + 15, enemies[j][i].destrect.x, player.destrect.y + 15, enemies[j][i].destrect.y,
 	                20, 40, 20, 40) == 1 && enemies[j][i].visible == 1){
 	            player.visible = 0;
-            } 
+            }
 	    }
 	}
 
@@ -532,7 +539,7 @@ int game_loop(SDL_Surface * screen)
     for (i = 0; i < 10; i++){
         for (j = 0; j < 4; j++){
             for (k = 0; k < 10; k++){
-                if (enemies[j][i].bullets[k].visible && 
+                if (enemies[j][i].bullets[k].visible &&
                         collision(enemies[j][i].bullets[k].destrect.x, player.destrect.x +15, enemies[j][i].bullets[k].destrect.y, player.destrect.y + 15,
                         10, 20, 10, 20)){
                     player.visible = 0;
@@ -588,6 +595,8 @@ int game_loop(SDL_Surface * screen)
     SDL_Flip(screen);
 
     }
+
+    /*** Delete Objects to Free Memory ***/
 
     delete_player(&player);
     for (i = 0; i < 7; i++){
