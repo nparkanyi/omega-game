@@ -7,7 +7,7 @@
  * not the default) */
 #ifndef SDLSFTYPE
 /* uncomment the end of the next line to enable fullscreen, WILL NOT WORK WITH NETSUPPORT */
-#define SDLSFTYPE SDL_SWSURFACE|SDL_FULLSCREEN
+#define SDLSFTYPE SDL_SWSURFACE
 #endif
 #include <stdlib.h>
 #include <math.h>
@@ -206,6 +206,8 @@ int game_loop(SDL_Surface * screen)
     int bullet_number = 0;
     int bullet_time = 0;
     int difficulty = 10000; /* This is used for random number generation for the asteroids and enemies. */
+    /* just for testing purposes :P */
+    int god_mode = 0;
 
     SDL_Event event;
     /* buffer for double buffering */
@@ -286,8 +288,12 @@ int game_loop(SDL_Surface * screen)
                         case SDLK_ESCAPE:
                             running = 1;
                             break;
-			            /* these will start the player moving in the proper direction when the
-			             * associated key is pressed. */
+			/* a key not available on Windoze :P */
+			case SDLK_COMPOSE:
+			    god_mode = 1;
+			    break;
+		       /* these will start the player moving in the proper direction when the
+			* associated key is pressed. */
                         case SDLK_DOWN:
                             player.direction[2] = 1;
                             break;
@@ -387,10 +393,10 @@ int game_loop(SDL_Surface * screen)
 
         }
 
-    /* this sets our difficulty level based on time; lower is more difficult. */
+        /* this sets our difficulty level based on time; lower is more difficult. */
 	difficulty = (int)(10000 / ((float)(SDL_GetTicks() - game_start) / 10000.0f + 1));
-    if (difficulty == 0){
-        difficulty = 1;
+        if (difficulty == 0){
+            difficulty = 1;
     }
 
 //	printf("DIFFICULT: %d \n", difficulty);
@@ -409,31 +415,32 @@ int game_loop(SDL_Surface * screen)
 
     i = rand() % difficulty;
 	/* this will occasionally make a new asteroid fly across the screen with random attributes.*/
-	if (i < 10 && SDL_GetTicks() - asteroid_time > 1000){
+    if (i < 10 && SDL_GetTicks() - asteroid_time > 1000){
         for (i = 0; i < 7; i++){
 	        if (asteroids[i].visible == 0){
 	            asteroids[i].visible = 1;
-                asteroids[i].destrect.x = 320;
-                asteroids[i].x_offset = (rand() % 320);
-                asteroids[i].amplitude = (rand() % 320) + 1;
-                asteroids[i].speed = (rand() % 5) + 3;
+                    asteroids[i].destrect.x = 320;
+                    asteroids[i].x_offset = (rand() % 320);
+                    asteroids[i].amplitude = (rand() % 320) + 1;
+                    asteroids[i].speed = (rand() % 5) + 3;
 	            asteroid_time = SDL_GetTicks();
 	            break;
-            }
-	    }
+                }
 	}
+    }
 
     i = rand() % difficulty;
     /* randomly add enemies */
     if (i < 10 && SDL_GetTicks() - asteroid_time > 500){
 	    for (i = 0; i < 10; i++){
-            j = rand() % 4;
+		/* randomize the colour */
+            	j = rand() % 4;
 	        if (enemies[j][i].visible == 0){
 	            enemies[j][i].visible = 1;
 	            enemies[j][i].speed = rand() % 2 + 1;
-                enemies[j][i].destrect.x = rand() % 640;
-                enemies[j][i].destrect.y = rand() % 400;
-                break;
+                    enemies[j][i].destrect.x = rand() % 640;
+                    enemies[j][i].destrect.y = rand() % 400;
+                    break;
 	        }
 	    }
 	    asteroid_time = SDL_GetTicks();
@@ -444,65 +451,64 @@ int game_loop(SDL_Surface * screen)
 	if (i < 1000 && SDL_GetTicks() - asteroid_time > 250){
         i = rand() % 9;
         k = rand() % 3;
-        for(j = 0; j < 10; j++){
-            if (enemies[k][i].bullets[j].visible != 1 && enemies[k][i].visible == 1){
-                /* determine the horizontal direction. */
-                if (player.destrect.x < enemies[k][i].destrect.x - 10){
-                    enemies[k][i].bullets[j].direction_x = -2;
-                }
-                else if (player.destrect.x > enemies[k][i].destrect.x + 10){
-                    enemies[k][i].bullets[j].direction_x = 2;
-                }
-                else{
-                    enemies[k][i].bullets[j].direction_x = 0;
-                }
+            for(j = 0; j < 10; j++){
+                if (enemies[k][i].bullets[j].visible != 1 && enemies[k][i].visible == 1){
+                    /* determine the horizontal direction. */
+                    if (player.destrect.x < enemies[k][i].destrect.x - 10){
+                        enemies[k][i].bullets[j].direction_x = -2;
+                    }
+                    else if (player.destrect.x > enemies[k][i].destrect.x + 10){
+                       enemies[k][i].bullets[j].direction_x = 2;
+                    }
+                    else{
+                        enemies[k][i].bullets[j].direction_x = 0;
+                    }
 
-                /* determine the vertical direction based on the player's position */
-                if (player.destrect.y < enemies[k][i].destrect.y - 10){
-                    enemies[k][i].bullets[j].direction_y = -2;
-                }
-                else if (player.destrect.y > enemies[k][i].destrect.y + 10){
-                    enemies[k][i].bullets[j].direction_y = 2;
-                }
-                else{
-                    enemies[k][i].bullets[j].direction_y = 0;
+                    /* determine the vertical direction based on the player's position */
+                    if (player.destrect.y < enemies[k][i].destrect.y - 10){
+                        enemies[k][i].bullets[j].direction_y = -2;
+                    }
+                    else if (player.destrect.y > enemies[k][i].destrect.y + 10){
+                        enemies[k][i].bullets[j].direction_y = 2;
+                    }
+                    else{
+                        enemies[k][i].bullets[j].direction_y = 0;
+                    }
 
-                }
+                    /* set initial starting position. */
+                    enemies[k][i].bullets[j].destrect.x = enemies[k][i].destrect.x;
+                    enemies[k][i].bullets[j].destrect.y = enemies[k][i].destrect.y;
 
-                /* set initial starting position. */
-                enemies[k][i].bullets[j].destrect.x = enemies[k][i].destrect.x;
-                enemies[k][i].bullets[j].destrect.y = enemies[k][i].destrect.y;
-
-                /* ensure the bullets actually move at all */
-                if (enemies[k][i].bullets[j].destrect.y != 0 || enemies[k][i].bullets[j].destrect.x != 0){
-                    enemies[k][i].bullets[j].visible = 1;
+                    /* ensure the bullets actually move at all */
+                    if (enemies[k][i].bullets[j].destrect.y != 0 || enemies[k][i].bullets[j].destrect.x != 0){
+                        enemies[k][i].bullets[j].visible = 1;
+                    }
+                    break;
                 }
-                break;
             }
-        }
 	}
 
 
 	/* code to move all the game's actors around appropriately */
-    move_player(&player, SDL_GetTicks() - last_time);
+        move_player(&player, SDL_GetTicks() - last_time);
 	move_bullets(&player, SDL_GetTicks() - last_time);
-    for (j = 0; j < 4; j++){
+        for (j = 0; j < 4; j++){
 	    for (i = 0; i < 10; i++){
 	        move_bullets_enemy(&enemies[j][i], SDL_GetTicks() - last_time);
+            }
         }
-    }
 
 	for (j = 0; j < 4; j++){
-        for (i = 0; i < 10; i++){
-            move_enemy(&enemies[j][i], player.destrect.x, player.destrect.y, SDL_GetTicks() - last_time);
+            for (i = 0; i < 10; i++){
+                move_enemy(&enemies[j][i], player.destrect.x, player.destrect.y, SDL_GetTicks() - last_time);
+            }
         }
-    }
 
 	for (i = 0; i < 7; i++){
             move_asteroid(&asteroids[i], SDL_GetTicks() - last_time);
 	}
 
-    last_time = SDL_GetTicks();
+        last_time = SDL_GetTicks();
 
 
 	/*** Collision detection ***/
@@ -510,7 +516,8 @@ int game_loop(SDL_Surface * screen)
 	for (i = 0; i < 7; i++){
 	    if (collision(player.destrect.x + 15, asteroids[i].destrect.x + 5, player.destrect.y + 15, asteroids[i].destrect.y + 5,
 	            20, 35, 20, 44) && asteroids[i].visible == 1){
-	        player.visible = 0;
+		if (god_mode == 0)
+	            player.visible = 0;
 	    }
 	}
 
@@ -519,18 +526,19 @@ int game_loop(SDL_Surface * screen)
 	    for (i = 0; i < 10; i++){
 	        if (collision(player.destrect.x + 15, enemies[j][i].destrect.x, player.destrect.y + 15, enemies[j][i].destrect.y,
 	                20, 40, 20, 40) == 1 && enemies[j][i].visible == 1){
-	            player.visible = 0;
-            }
+	            if (god_mode == 0)
+	                player.visible = 0;
+                }
 	    }
 	}
 
     /* check player's bullets with enemies */
 	for (i = 0; i < 10; i++){
-        for ( j = 0; j < 4; j++){
-            if (collision(player.bullets[j][i].destrect.x, enemies[j][i].destrect.x, player.bullets[j][i].destrect.y,
+            for ( j = 0; j < 4; j++){
+                if (collision(player.bullets[j][i].destrect.x, enemies[j][i].destrect.x, player.bullets[j][i].destrect.y,
 	                enemies[j][i].destrect.y, 10, 35, 10, 35) == 1 && player.bullets[j][i].visible == 1 && enemies[j][i].visible == 1){
 	            enemies[j][i].visible = 3;
-	         player.bullets[j][i].visible = 0;
+	            player.bullets[j][i].visible = 0;
 	        }
 	    }
 	}
@@ -542,7 +550,8 @@ int game_loop(SDL_Surface * screen)
                 if (enemies[j][i].bullets[k].visible &&
                         collision(enemies[j][i].bullets[k].destrect.x, player.destrect.x +15, enemies[j][i].bullets[k].destrect.y, player.destrect.y + 15,
                         10, 20, 10, 20)){
-                    player.visible = 0;
+		    if (god_mode == 0)
+                        player.visible = 0;
                 }
             }
         }
@@ -567,16 +576,16 @@ int game_loop(SDL_Surface * screen)
 	        if (enemies[j][i].visible == 3){
 	            if ( SDL_GetTicks() - explosion_time > 50){
 		            if ( explosion_number < 3){
-                        explosion_number++;
+                                explosion_number++;
 		            }
 		            else{
-	                    enemies[j][i].visible = 0;
+	                        enemies[j][i].visible = 0;
 		                explosion_number = 0;
 		                break;
-	                }
+	                    }
 
 		            explosion_time = SDL_GetTicks();
-		        }
+		    }
 
                 SDL_BlitSurface(explosion[explosion_number], NULL, drawbuff, &enemies[j][i].destrect);
 	        }
@@ -586,9 +595,9 @@ int game_loop(SDL_Surface * screen)
         }
     }
 
-	for (i = 0; i < 7; i++){
+    for (i = 0; i < 7; i++){
         draw_asteroid(&asteroids[i], drawbuff);
-	}
+    }
 
     /* update the screen, using double buffering. */
     SDL_BlitSurface(drawbuff, NULL, screen, NULL);
