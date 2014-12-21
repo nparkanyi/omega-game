@@ -6,7 +6,6 @@ enum colours { YELLOW, RED, BLUE, BLACK };
 typedef struct {
 	SDL_Surface * animation[4];
 	SDL_Rect destrect;
-	/* these indicate the direction in which the bullet moves */
 	int direction_x;
 	int direction_y;
 	int visible;
@@ -23,7 +22,6 @@ typedef struct {
 	int colour;
 	/* used for bullet timing. */
 	int time;
-	/* if 0, player not on screen*/
 	int visible;
 	/* 4 directions for each of the ship's four colours */
 	SDL_Surface * sprites[4][4];
@@ -44,7 +42,6 @@ typedef struct {
 	int time;
 	/* frequency of gunfire */
 	int frequency;
-	/* speed of the enemy's movement */
 	int speed;
 	/* 3 indicates the enemy is in the process of being blown up. */
 	int visible;

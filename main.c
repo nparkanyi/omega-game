@@ -6,7 +6,6 @@
  * to be hardware instead of software (can be problematic on some systems, so it's
  * not the default) */
 #ifndef SDLSFTYPE
-/* uncomment the end of the next line to enable fullscreen, WILL NOT WORK WITH NETSUPPORT */
 #define SDLSFTYPE SDL_SWSURFACE
 #endif
 #include <stdlib.h>
@@ -55,7 +54,6 @@ int main(int argc, char ** argv)
 		score = game_loop(screen);
 		show_score(screen, score);
 	}
-	//SDL_FreeSurface(screen);
 }
 
 int show_menu(SDL_Surface * screen)
@@ -70,7 +68,6 @@ int show_menu(SDL_Surface * screen)
 	SDL_EventState(SDL_KEYDOWN, SDL_ENABLE);
 
 	while (1) {
-		/* cycle through sdl events*/
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 			case SDL_QUIT:
@@ -90,7 +87,6 @@ int show_menu(SDL_Surface * screen)
 			}
 		}
 
-		/* draw menu graphic on screen */
 		SDL_Flip(screen);
 	}
 
@@ -169,13 +165,11 @@ void show_score(SDL_Surface * screen, int score)
 		number_dest.x -= 22;
 	}
 
-	/* update the screen */
 	SDL_Flip(screen);
 
 	SDL_EventState(SDL_KEYDOWN, SDL_ENABLE);
 
 	SDL_Delay(500);
-	/* wait for user input*/
 	SDL_WaitEvent(NULL);
 
 	/* destroy the allocated surfaces. */
@@ -205,7 +199,6 @@ int game_loop(SDL_Surface * screen)
 	int bullet_number = 0;
 	int bullet_time = 0;
 	int difficulty = 10000; /* This is used for random number generation for the asteroids and enemies. */
-	/* just for testing purposes :P */
 	int god_mode = 0;
 
 	SDL_Event event;
@@ -215,7 +208,6 @@ int game_loop(SDL_Surface * screen)
 
 	Mix_Music * music;
 
-	/* contains all the player attributes. */
 	player player;
 	/* up to 10 enemies of each colour on screen at once. */
 	enemy enemies[4][10];
@@ -270,7 +262,6 @@ int game_loop(SDL_Surface * screen)
 	/* ********* Main Game Loop **********/
 	while (running == 0) {
 
-		/* loop to ensure we handle all events. */
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 			/* this event indicates the window being closed */
@@ -286,10 +277,12 @@ int game_loop(SDL_Surface * screen)
 					break;
 				/* a key not available on Windoze :P */
 				case SDLK_COMPOSE:
-					god_mode = 1;
+					if (god_mode == 1)
+						god_mode = 0;
+					else
+						god_mode = 1;
 					break;
-				/* these will start the player moving in the proper direction when the
-				 * associated key is pressed. */
+				/* Player movement. */ 
 				case SDLK_DOWN:
 					player.direction[2] = 1;
 					break;
@@ -332,15 +325,13 @@ int game_loop(SDL_Surface * screen)
 							player.bullets[player.colour][i].destrect.x = player.destrect.x + 20;
 							player.bullets[player.colour][i].destrect.y = player.destrect.y + 20;
 
-							/* send the bullet in the appropriate direction, depending on the player's
-							 * orientation. */
 							switch (player.orientation) {
 							case 0:
 								player.bullets[player.colour][i].direction_x = 0;
 								player.bullets[player.colour][i].direction_y = -10;
 								break;
 
-							case 1:
+						case 1:
 								player.bullets[player.colour][i].direction_x = 10;
 								player.bullets[player.colour][i].direction_y = 0;
 								break;
@@ -387,8 +378,6 @@ int game_loop(SDL_Surface * screen)
 		difficulty = (int)(10000 / ((float)(SDL_GetTicks() - game_start) / 10000.0f + 1));
 		if (difficulty == 0)
 			difficulty = 1;
-
-//	printf("DIFFICULT: %d \n", difficulty);
 
 		/* play the player death animation if the player has been set as invisible. */
 		if (player.visible == 0) {
