@@ -243,7 +243,7 @@ int game_loop(SDL_Surface * screen)
         enemies[RED][i] = load_enemy("img/enemyred", "img/bulletred", screen);
     }
     for (i = 0; i < 10; i++){
-	enemies[BLUE][i] = load_enemy("img/enemyblue", "img/bulletblue", screen);
+		enemies[BLUE][i] = load_enemy("img/enemyblue", "img/bulletblue", screen);
     }
     for (i = 0; i < 10; i++){
         enemies[BLACK][i] = load_enemy("img/enemyblack", "img/bulletblack", screen);
@@ -288,12 +288,12 @@ int game_loop(SDL_Surface * screen)
                         case SDLK_ESCAPE:
                             running = 1;
                             break;
-			/* a key not available on Windoze :P */
-			case SDLK_COMPOSE:
-			    god_mode = 1;
-			    break;
-		       /* these will start the player moving in the proper direction when the
-			* associated key is pressed. */
+				/* a key not available on Windoze :P */
+				case SDLK_COMPOSE:
+			    	god_mode = 1;
+			    	break;
+		       	/* these will start the player moving in the proper direction when the
+				 * associated key is pressed. */
                         case SDLK_DOWN:
                             player.direction[2] = 1;
                             break;
@@ -394,7 +394,7 @@ int game_loop(SDL_Surface * screen)
         }
 
         /* this sets our difficulty level based on time; lower is more difficult. */
-	difficulty = (int)(10000 / ((float)(SDL_GetTicks() - game_start) / 10000.0f + 1));
+		difficulty = (int)(10000 / ((float)(SDL_GetTicks() - game_start) / 10000.0f + 1));
         if (difficulty == 0){
             difficulty = 1;
     }
@@ -490,9 +490,9 @@ int game_loop(SDL_Surface * screen)
 
 
 	/* code to move all the game's actors around appropriately */
-        move_player(&player, SDL_GetTicks() - last_time);
+    move_player(&player, SDL_GetTicks() - last_time);
 	move_bullets(&player, SDL_GetTicks() - last_time);
-        for (j = 0; j < 4; j++){
+    	for (j = 0; j < 4; j++){
 	    for (i = 0; i < 10; i++){
 	        move_bullets_enemy(&enemies[j][i], SDL_GetTicks() - last_time);
             }
@@ -534,13 +534,15 @@ int game_loop(SDL_Surface * screen)
 
     /* check player's bullets with enemies */
 	for (i = 0; i < 10; i++){
+		for (k = 0; k < 10; k++){
             for ( j = 0; j < 4; j++){
-                if (collision(player.bullets[j][i].destrect.x, enemies[j][i].destrect.x, player.bullets[j][i].destrect.y,
-	                enemies[j][i].destrect.y, 10, 35, 10, 35) == 1 && player.bullets[j][i].visible == 1 && enemies[j][i].visible == 1){
-	            enemies[j][i].visible = 3;
-	            player.bullets[j][i].visible = 0;
-	        }
-	    }
+                if (collision(player.bullets[j][i].destrect.x, enemies[j][k].destrect.x, player.bullets[j][i].destrect.y,
+	                enemies[j][k].destrect.y, 10, 35, 10, 35) == 1 && player.bullets[j][i].visible == 1 && enemies[j][k].visible == 1){
+	            	enemies[j][k].visible = 3;
+	            	player.bullets[j][i].visible = 0;
+	        	}
+	    	}
+		}
 	}
 
     /* check enemies' bullets with player. */
