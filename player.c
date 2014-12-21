@@ -308,6 +308,7 @@ void delete_enemy(enemy * enemy)
         delete_bullet(&(enemy->bullets[j]));
     }
 }
+
 /* general function for loading series of numbered bitmaps into
  * sprites. */
 void load_sprite(SDL_Surface ** sprites, int num_sprites,
