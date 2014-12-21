@@ -35,7 +35,11 @@ int main(int argc, char ** argv)
 	}
 
 	/* create a new window */
-	screen = SDL_SetVideoMode(640, 480, 16, SDLSFTYPE);
+	if (argc == 2 && strcmp(argv[1], "-w") == 0)
+		screen = SDL_SetVideoMode(640, 480, 16, SDLSFTYPE);
+	else
+		screen = SDL_SetVideoMode(640, 480, 16, SDLSFTYPE|SDL_FULLSCREEN);
+
 	if (screen == NULL) {
 		printf("Unable to set 640x480 video: %s\n", SDL_GetError());
 		return 1;
