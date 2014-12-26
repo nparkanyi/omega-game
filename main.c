@@ -608,7 +608,10 @@ int game_loop(SDL_Surface * screen)
 
 	SDL_Delay(500);
 	/* return the player's score, seconds since start of game. */
-	return (int)((SDL_GetTicks() - game_start) / 1000.0f);
+	if (god_mode == 0)
+		return (int)((SDL_GetTicks() - game_start) / 1000.0f);
+	else
+		return 0;
 }
 
 
