@@ -404,18 +404,37 @@ int game_loop(SDL_Surface * screen)
 			for (i = 0; i < 7; i++) {
 				if (asteroids[i].visible == 0) {
 					asteroids[i].visible = 1;
-					asteroids[i].destrect.x = 320;
-					asteroids[i].x_offset = (rand() % 320);
+					asteroids[i].offset = (rand() % 320);
 					asteroids[i].amplitude = (rand() % 320) + 1;
 					asteroids[i].speed = (rand() % 5) + 3;
-					if ((rand() % 10) <= 5)
+					if ((rand() % 10) <= 5){
 						asteroids[i].direction = 1;
+						/* travelling down */
+						if ((rand() % 10) < 5){
+							asteroids[i].orientation = 0;
+							asteroids[i].destrect.y = 0;
+						}
+						/* travelling right */
+						else{
+							asteroids[i].orientation = 1;
+							asteroids[i].destrect.x = 0;
+						}
+					}
 					else{
 						asteroids[i].direction = -1;
-						asteroids[i].destrect.y = 479;
+						/* travelling up */
+						if ((rand() % 10) < 5){
+							asteroids[i].orientation = 0;
+							asteroids[i].destrect.y = 479;
+						}
+						/* travelling left*/
+						else{
+							asteroids[i].orientation = 1;
+							asteroids[i].destrect.x = 639;
 					}
 					asteroid_time = SDL_GetTicks();
 					break;
+					}
 				}
 			}
 		}

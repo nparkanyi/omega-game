@@ -83,10 +83,11 @@ asteroid load_asteroid(SDL_Surface * sprite)
 	SDL_SetColorKey(asteroid.sprite, SDL_SRCCOLORKEY, SDL_MapRGB(sprite->format, 255, 255, 255));
 	asteroid.visible = 0;
 	asteroid.speed = 3;
-	asteroid.x_offset = 320;
+	asteroid.offset = 320;
 	asteroid.amplitude = 200;
 	asteroid.destrect.x = 320;
 	asteroid.destrect.y = 0;
+	asteroid.orientation = 0;
 
 	return asteroid;
 }
@@ -138,24 +139,38 @@ void move_enemy(enemy * enemy, int player_x, int player_y, int time)
 
 void move_asteroid(asteroid * asteroid, int time)
 {
-	int increment_y;
+	int increment;
 
-	increment_y = time / 30.0f * asteroid->speed * asteroid->direction;
+	increment = time / 30.0f * asteroid->speed * asteroid->direction;
 
-	if (asteroid->visible == 1) {
-		asteroid->destrect.y += increment_y;
+	if (asteroid->visible == 1 && asteroid->orientation == 0) {
+		asteroid->destrect.y += increment;
 		/* move asteroid in a sine curve with a y increment for maximum dramatic effect . */
 		asteroid->destrect.x = (int)(asteroid->amplitude *
-					     sin(0.01f * asteroid->speed * asteroid->destrect.y) + asteroid->amplitude + asteroid->x_offset);
+				sin(0.01f * asteroid->speed * asteroid->destrect.y) + asteroid->amplitude + asteroid->offset);
+	}
+	else if (asteroid->visible == 1 && asteroid->orientation == 1) {
+		asteroid->destrect.x += increment;
+		/* move asteroid in a sine curve with x increment */
+		asteroid->destrect.y = (int)(asteroid->amplitude *
+				sin(0.01f * asteroid->speed * asteroid->destrect.x) + asteroid->amplitude + asteroid->offset);
 	}
 
-	if (asteroid->destrect.y >= 480) {
+	if (asteroid->destrect.y >= 480 && asteroid->orientation == 0) {
 		asteroid->visible = 0;
 		asteroid->destrect.y = 0;
 	}
-	if (asteroid->destrect.y < 0){
+	if (asteroid->destrect.y < 0 && asteroid->orientation == 0) {
 		asteroid->visible = 0;
 		asteroid->destrect.y = 0;
+	}
+	if (asteroid->destrect.x < 0 && asteroid->orientation == 1) {
+		asteroid->visible = 0;
+		asteroid->destrect.x = 0;
+	}
+	if (asteroid->destrect.x >= 640 && asteroid->orientation == 1) {
+		asteroid->visible = 0;
+		asteroid->destrect.x = 0;
 	}
 }
 
