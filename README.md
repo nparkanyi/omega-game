@@ -7,4 +7,5 @@ Music by Kevin McLeod.
 
 Requires SDL 1.2 and SDL_mixer 1.2.
 
-TODO: smooth rotation, upgrade to SDL2. 
+TODO: smooth rotation, upgrade to SDL2, make graphics
+less shitty. 
