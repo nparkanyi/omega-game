@@ -307,10 +307,10 @@ void load_sprite(SDL_Surface ** sprites, int num_sprites,
 
 	/* prepares the filename with the prefix and postfix,
 	 * leaving space for the numbers. */
-	strcpy(filename, prefix);
+	strncpy(filename, prefix, 54);
 	filename[strlen(prefix)] = ' ';
 	filename[strlen(prefix) + 1] = '\0';
-	strcat(filename, postfix);
+	strncat(filename, postfix, 4);
 
 	for (i = 0; i < num_sprites; i++) {
 		/* change the number in the filename */
