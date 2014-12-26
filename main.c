@@ -104,6 +104,7 @@ void show_score(SDL_Surface * screen, int score)
 	SDL_Surface * score_background;
 	SDL_Surface * numbers[10];
 	SDL_Rect number_dest;
+	SDL_Event event;
 	Mix_Music * music = NULL;
 
 	/* set up music */
@@ -169,12 +170,14 @@ void show_score(SDL_Surface * screen, int score)
 		number_dest.x -= 22;
 	}
 
-	SDL_Flip(screen);
-
-	SDL_EventState(SDL_KEYDOWN, SDL_ENABLE);
-
-	SDL_Delay(500);
-	SDL_WaitEvent(NULL);
+	while (1){
+		while (SDL_PollEvent(&event)){
+			if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN)
+				goto exit;
+		}
+		SDL_Flip(screen);
+	}
+	exit:
 
 	/* destroy the allocated surfaces. */
 	SDL_FreeSurface(score_background);
