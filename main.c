@@ -408,6 +408,12 @@ int game_loop(SDL_Surface * screen)
 					asteroids[i].x_offset = (rand() % 320);
 					asteroids[i].amplitude = (rand() % 320) + 1;
 					asteroids[i].speed = (rand() % 5) + 3;
+					if ((rand() % 10) <= 5)
+						asteroids[i].direction = 1;
+					else{
+						asteroids[i].direction = -1;
+						asteroids[i].destrect.y = 479;
+					}
 					asteroid_time = SDL_GetTicks();
 					break;
 				}

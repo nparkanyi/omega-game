@@ -140,7 +140,7 @@ void move_asteroid(asteroid * asteroid, int time)
 {
 	int increment_y;
 
-	increment_y = time / 30.0f * asteroid->speed;
+	increment_y = time / 30.0f * asteroid->speed * asteroid->direction;
 
 	if (asteroid->visible == 1) {
 		asteroid->destrect.y += increment_y;
@@ -150,6 +150,10 @@ void move_asteroid(asteroid * asteroid, int time)
 	}
 
 	if (asteroid->destrect.y >= 480) {
+		asteroid->visible = 0;
+		asteroid->destrect.y = 0;
+	}
+	if (asteroid->destrect.y < 0){
 		asteroid->visible = 0;
 		asteroid->destrect.y = 0;
 	}

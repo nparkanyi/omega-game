@@ -54,6 +54,7 @@ typedef struct {
 	SDL_Surface * sprite;
 	int visible;
 	int speed; /* can be between 5 and 9 */
+	int direction;
 	int x_offset;
 	int amplitude;
 	SDL_Rect destrect;
