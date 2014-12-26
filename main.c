@@ -396,6 +396,7 @@ int game_loop(SDL_Surface * screen)
 			SDL_Delay(2000);
 			/* quit the game */
 			running = 1;
+			continue;
 		}
 
 		i = rand() % difficulty;
