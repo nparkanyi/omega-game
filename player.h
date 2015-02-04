@@ -4,61 +4,61 @@
 enum colours { YELLOW, RED, BLUE, BLACK };
 
 typedef struct {
-	SDL_Surface * animation[4];
-	SDL_Rect destrect;
-	int direction_x;
-	int direction_y;
-	int visible;
+  SDL_Surface * animation[4];
+  SDL_Rect destrect;
+  int direction_x;
+  int direction_y;
+  int visible;
 } bullet;
 
 typedef struct {
-	/* either 1 or 0 to indicate whether the player is currently
-	 * moving in that direction.
-	 * Elements 0-3 represent the
-	 * cardinal directions.*/
-	int direction[4];
-	/* 0 to 3 */
-	int orientation;
-	int colour;
-	/* used for bullet timing. */
-	int time;
-	int visible;
-	/* 4 directions for each of the ship's four colours */
-	SDL_Surface * sprites[4][4];
-	/* used for SDL blitting, contains the coordinates to blit to */
-	SDL_Rect destrect;
-	/* the player can shoot up to 10 bullets on the screen at the
-	 * same time for each of the four colours. */
-	bullet bullets[4][10];
+  /* either 1 or 0 to indicate whether the player is currently
+   * moving in that direction.
+   * Elements 0-3 represent the
+   * cardinal directions.*/
+  int direction[4];
+  /* 0 to 3 */
+  int orientation;
+  int colour;
+  /* used for bullet timing. */
+  int time;
+  int visible;
+  /* 4 directions for each of the ship's four colours */
+  SDL_Surface * sprites[4][4];
+  /* used for SDL blitting, contains the coordinates to blit to */
+  SDL_Rect destrect;
+  /* the player can shoot up to 10 bullets on the screen at the
+   * same time for each of the four colours. */
+  bullet bullets[4][10];
 } player;
 
 /* The same data structure for the player will be used for the
  * enemies. */
 typedef struct {
-	/* directions currently travelled in */
-	int direction[4];
-	int colour;
-	/* bullet timing */
-	int time;
-	/* frequency of gunfire */
-	int frequency;
-	int speed;
-	/* 3 indicates the enemy is in the process of being blown up. */
-	int visible;
-	SDL_Surface * sprite;
-	SDL_Rect destrect;
-	bullet bullets[10];
+  /* directions currently travelled in */
+  int direction[4];
+  int colour;
+  /* bullet timing */
+  int time;
+  /* frequency of gunfire */
+  int frequency;
+  int speed;
+  /* 3 indicates the enemy is in the process of being blown up. */
+  int visible;
+  SDL_Surface * sprite;
+  SDL_Rect destrect;
+  bullet bullets[10];
 }enemy;
 
 typedef struct {
-	SDL_Surface * sprite;
-	int visible;
-	int speed; /* can be between 5 and 9 */
-	int orientation; /* 0 up-down, 1 left-right */
-	int direction; 
-	int offset;
-	int amplitude;
-	SDL_Rect destrect;
+  SDL_Surface * sprite;
+  int visible;
+  int speed; /* can be between 5 and 9 */
+  int orientation; /* 0 up-down, 1 left-right */
+  int direction; 
+  int offset;
+  int amplitude;
+  SDL_Rect destrect;
 } asteroid;
 
 /* general function for loading series of numbered bitmaps into sprites. */
