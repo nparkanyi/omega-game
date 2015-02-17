@@ -123,13 +123,6 @@ void move_enemy(enemy * enemy, int player_x, int player_y, int time)
     y_move = (int)((player_y - enemy->destrect.y) / 50.0f);
     x_move = (int)((player_x - enemy->destrect.x) / 50.0f);
 
-    /*if (player_y < enemy->destrect.y){
-        y_move *= -1;
-       }
-       if (player_x < enemy->destrect.x){
-        x_move *= -1;
-       }*/
-
     if (increment == 0)
       increment = 1;
     enemy->destrect.x += x_move * increment;
