@@ -55,7 +55,7 @@ typedef struct {
   int visible;
   int speed; /* can be between 5 and 9 */
   int orientation; /* 0 up-down, 1 left-right */
-  int direction; 
+  int direction;
   int offset;
   int amplitude;
   SDL_Rect destrect;

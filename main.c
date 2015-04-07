@@ -289,7 +289,7 @@ int game_loop(SDL_Surface * screen)
           else
             god_mode = 1;
           break;
-        /* Player movement. */ 
+        /* Player movement. */
         case SDLK_DOWN:
           player.direction[2] = 1;
           break;
