@@ -303,6 +303,7 @@ int game_loop(SDL_Surface * screen)
           player.direction[1] = 1;
           break;
         /* rotate the player to the right. */
+        case SDLK_d:
         case SDLK_LALT:
           if (player.orientation == 3)
             player.orientation = 0;
@@ -310,6 +311,7 @@ int game_loop(SDL_Surface * screen)
             player.orientation++;
           break;
         /* rotate the player to the left. */
+        case SDLK_a:
         case SDLK_LCTRL:
           if (player.orientation == 0)
             player.orientation = 3;
@@ -317,6 +319,7 @@ int game_loop(SDL_Surface * screen)
             player.orientation--;
           break;
         /* Switch the current colour of the player. */
+        case SDLK_s:
         case SDLK_LSHIFT:
           if (player.colour == BLACK)
             player.colour = YELLOW;
